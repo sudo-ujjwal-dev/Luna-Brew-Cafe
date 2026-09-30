@@ -1,0 +1,46 @@
+import React from 'react';
+import type { Metadata } from 'next';
+import PublicNav from '@/components/PublicNav';
+import PublicFooter from '@/components/PublicFooter';
+import MenuClient from './components/MenuClient';
+
+export const metadata: Metadata = {
+  title: 'Menu — Luna Brew Café',
+  description:
+    'Explore our full menu of specialty coffees, teas, handcrafted meals, and desserts at Luna Brew Café in Brooklyn, NY.',
+};
+
+export default function MenuPage() {
+  return (
+    <>
+      <PublicNav currentPath="/menu" />
+      <main className="min-h-screen">
+        {/* Hero */}
+        <div className="relative bg-foreground pt-32 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+          <div className="absolute inset-0 opacity-10">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(circle at 30% 50%, var(--accent) 0%, transparent 50%),
+                                  radial-gradient(circle at 70% 50%, var(--primary) 0%, transparent 50%)`,
+              }}
+            />
+          </div>
+          <div className="max-w-screen-xl mx-auto relative z-10 text-center">
+            <p className="text-accent text-xs font-600 uppercase tracking-widest mb-3">
+              Luna Brew Café
+            </p>
+            <h1 className="text-display font-800 text-white mb-3">Our Menu</h1>
+            <p className="text-white/60 max-w-md mx-auto text-sm leading-relaxed">
+              Everything made fresh daily. From our single-origin espresso to our seasonal specials —
+              crafted with care, served with warmth.
+            </p>
+          </div>
+        </div>
+
+        <MenuClient />
+      </main>
+      <PublicFooter />
+    </>
+  );
+}
