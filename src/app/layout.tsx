@@ -1,7 +1,6 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, DM_Mono } from 'next/font/google';
-import { Toaster } from 'sonner';
 import '../styles/tailwind.css';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -24,18 +23,21 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Luna Brew Café — Good Coffee. Good Food. Good Moments.',
+  ...(process.env.NEXT_PUBLIC_SITE_URL
+    ? { metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL) }
+    : {}),
+  title: 'Luna Brew Café | Lakeside, Pokhara',
   description:
-    'Visit Luna Brew Café for specialty coffee, handcrafted meals, and a warm atmosphere. Browse our menu, book a table, or order online today.',
-  keywords: ['cafe', 'coffee', 'restaurant', 'Luna Brew', 'specialty coffee', 'brunch'],
+    'A fictional café website concept for Lakeside, Pokhara, Nepal. Explore sample café food, coffee, and business features.',
+  keywords: ['cafe', 'coffee shop', 'restaurant', 'Luna Brew', 'Lakeside', 'Pokhara', 'Nepal'],
   openGraph: {
     title: 'Luna Brew Café',
-    description: 'Good coffee. Good food. Good moments.',
+    description: 'A fictional café concept for Lakeside, Pokhara, Nepal.',
     type: 'website',
-    locale: 'en_US',
+    locale: 'en_NP',
   },
   icons: {
-    icon: [{ url: '/favicon.ico', type: 'image/x-icon' }],
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
   },
 };
 
@@ -46,22 +48,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${dmMono.variable}`}>
-      <body className={plusJakartaSans.className}>
-        {children}
-        <Toaster
-          position="bottom-right"
-          toastOptions={{
-            style: {
-              background: 'var(--card)',
-              color: 'var(--foreground)',
-              border: '1px solid var(--border)',
-              fontFamily: 'var(--font-sans)',
-            },
-          }}
-        />
-
-        <script type="module" async src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Flunabrewca5255back.builtwithrocket.new&_be=https%3A%2F%2Fappanalytics.rocket.new&_v=0.1.20" />
-        <script type="module" defer src="https://static.rocket.new/rocket-shot.js?v=0.0.3" /></body>
+      <body className={plusJakartaSans.className}>{children}</body>
     </html>
   );
 }

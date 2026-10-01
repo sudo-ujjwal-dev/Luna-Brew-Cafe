@@ -4,39 +4,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
-import { LayoutDashboard, UtensilsCrossed, ShoppingBag, CalendarDays, Star, Images, Settings, ChevronLeft, ChevronRight, LogOut, Tag, Globe,  } from 'lucide-react';
-import Icon from '@/components/ui/AppIcon';
-
+import { LayoutDashboard, ChevronLeft, ChevronRight, LogOut, Globe } from 'lucide-react';
 
 const navGroups = [
   {
     label: 'Overview',
-    items: [
-      { href: '/admin-dashboard', label: 'Dashboard', Icon: LayoutDashboard, badge: null },
-    ],
-  },
-  {
-    label: 'Operations',
-    items: [
-      { href: '/admin-dashboard/orders', label: 'Orders', Icon: ShoppingBag, badge: '4' },
-      { href: '/admin-dashboard/reservations', label: 'Reservations', Icon: CalendarDays, badge: '7' },
-      { href: '/admin-dashboard/reviews', label: 'Reviews', Icon: Star, badge: '3' },
-    ],
-  },
-  {
-    label: 'Content',
-    items: [
-      { href: '/admin-dashboard/menu', label: 'Menu Items', Icon: UtensilsCrossed, badge: null },
-      { href: '/admin-dashboard/categories', label: 'Categories', Icon: Tag, badge: null },
-      { href: '/admin-dashboard/gallery', label: 'Gallery', Icon: Images, badge: null },
-    ],
-  },
-  {
-    label: 'Settings',
-    items: [
-      { href: '/admin-dashboard/business', label: 'Business Info', Icon: Globe, badge: null },
-      { href: '/admin-dashboard/settings', label: 'Settings', Icon: Settings, badge: null },
-    ],
+    items: [{ href: '/admin-dashboard', label: 'Dashboard', Icon: LayoutDashboard, badge: null }],
   },
 ];
 
@@ -51,9 +24,11 @@ export default function AdminSidebar() {
       } min-h-screen sticky top-0`}
     >
       {/* Logo */}
-      <div className={`flex items-center border-b border-border transition-all duration-300 ${
-        collapsed ? 'justify-center px-0 h-16' : 'gap-2.5 px-4 h-16'
-      }`}>
+      <div
+        className={`flex items-center border-b border-border transition-all duration-300 ${
+          collapsed ? 'justify-center px-0 h-16' : 'gap-2.5 px-4 h-16'
+        }`}
+      >
         <AppLogo size={32} />
         {!collapsed && (
           <div className="overflow-hidden">
@@ -82,13 +57,16 @@ export default function AdminSidebar() {
                       title={collapsed ? label : undefined}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150 group relative ${
                         isActive
-                          ? 'admin-sidebar-active' :'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
+                          ? 'admin-sidebar-active'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
                       } ${collapsed ? 'justify-center' : ''}`}
                     >
                       <Icon
                         size={18}
                         className={`flex-shrink-0 sidebar-icon transition-colors ${
-                          isActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
+                          isActive
+                            ? 'text-primary'
+                            : 'text-muted-foreground group-hover:text-foreground'
                         }`}
                       />
                       {!collapsed && (
@@ -123,15 +101,17 @@ export default function AdminSidebar() {
           <Globe size={18} className="flex-shrink-0" />
           {!collapsed && <span className="font-500">View Website</span>}
         </Link>
-        <button
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-danger hover:bg-danger-bg transition-all duration-150 w-full ${
-            collapsed ? 'justify-center' : ''
-          }`}
-          title={collapsed ? 'Sign Out' : undefined}
-        >
-          <LogOut size={18} className="flex-shrink-0" />
-          {!collapsed && <span className="font-500">Sign Out</span>}
-        </button>
+        <form action="/api/admin/logout" method="post">
+          <button
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-danger hover:bg-danger-bg transition-all duration-150 w-full ${
+              collapsed ? 'justify-center' : ''
+            }`}
+            title={collapsed ? 'Sign Out' : undefined}
+          >
+            <LogOut size={18} className="flex-shrink-0" />
+            {!collapsed && <span className="font-500">Sign Out</span>}
+          </button>
+        </form>
 
         {/* Collapse toggle */}
         <button
@@ -140,7 +120,9 @@ export default function AdminSidebar() {
             collapsed ? 'justify-center' : ''
           }`}
         >
-          {collapsed ? <ChevronRight size={16} /> : (
+          {collapsed ? (
+            <ChevronRight size={16} />
+          ) : (
             <>
               <ChevronLeft size={16} />
               <span>Collapse</span>

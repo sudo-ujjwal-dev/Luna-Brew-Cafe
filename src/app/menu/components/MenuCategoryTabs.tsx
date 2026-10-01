@@ -42,7 +42,8 @@ export default function MenuCategoryTabs({
           <span
             className={`text-xs font-700 px-1.5 py-0.5 rounded-full font-mono-data ${
               activeCategory === cat.slug
-                ? 'bg-white/20 text-white' :'bg-muted text-muted-foreground'
+                ? 'bg-white/20 text-white'
+                : 'bg-muted text-muted-foreground'
             }`}
           >
             {counts[cat.slug] ?? 0}

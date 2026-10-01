@@ -11,9 +11,9 @@ import HoursLocationSection from './components/HoursLocationSection';
 import BookingSection from './components/BookingSection';
 
 export const metadata: Metadata = {
-  title: 'Luna Brew Café — Good Coffee. Good Food. Good Moments.',
+  title: 'Luna Brew Café | Coffee & café food in Lakeside, Pokhara',
   description:
-    'Specialty coffee, handcrafted food, and warm vibes at Luna Brew Café in Brooklyn, NY. Book a table or browse our menu today.',
+    'Explore a fictional café concept for Lakeside, Pokhara, Nepal. Browse the sample menu, view the demo location, and learn about the Luna Brew Café portfolio project.',
 };
 
 export default function HomePage() {

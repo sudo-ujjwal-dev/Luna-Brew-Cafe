@@ -2,10 +2,6 @@ import React from 'react';
 import type { Metadata } from 'next';
 import AdminLayout from '@/components/AdminLayout';
 import KPIBentoGrid from './components/KPIBentoGrid';
-import RevenueChart from './components/RevenueChart';
-import ReservationsTable from './components/ReservationsTable';
-import OrdersTable from './components/OrdersTable';
-import ReviewQueue from './components/ReviewQueue';
 
 export const metadata: Metadata = {
   title: 'Dashboard — Luna Brew Admin',
@@ -14,28 +10,16 @@ export const metadata: Metadata = {
 
 export default function AdminDashboardPage() {
   return (
-    <AdminLayout
-      title="Dashboard"
-      subtitle="Monday, September 28, 2026 · 1:45 PM"
-    >
+    <AdminLayout title="Dashboard" subtitle="Luna Brew Café operations">
       <div className="space-y-8">
+        <div role="status" className="rounded-2xl border border-warning/30 bg-warning-bg p-5">
+          <h2 className="font-700 text-foreground">Live business data is not connected</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            This preview does not have a database configured. Orders, reservations, revenue, and
+            reviews will appear here after the persistence layer is set up.
+          </p>
+        </div>
         <KPIBentoGrid />
-
-        {/* Charts row */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-          <div className="xl:col-span-2">
-            <RevenueChart />
-          </div>
-          <div className="xl:col-span-1">
-            <ReviewQueue />
-          </div>
-        </div>
-
-        {/* Tables row */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-          <ReservationsTable />
-          <OrdersTable />
-        </div>
       </div>
     </AdminLayout>
   );

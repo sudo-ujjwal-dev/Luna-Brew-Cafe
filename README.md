@@ -1,91 +1,38 @@
-# Next.js
+# Luna Brew Café
 
-A modern Next.js 15 application built with TypeScript and Tailwind CSS.
+A Next.js 15 portfolio website for a fictional café concept in Lakeside, Pokhara, Nepal. Menu items and NPR prices, sample opening hours, contact details, and imagery are illustrative; this is not a real café listing.
 
-## 🚀 Features
+## Run locally
 
-- **Next.js 15** - Latest version with improved performance and features
-- **React 19** - Latest React version with enhanced capabilities
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
-
-## 🛠️ Installation
-
-1. Install dependencies:
-  ```bash
-  npm install
-  # or
-  yarn install
-  ```
-
-2. Start the development server:
-  ```bash
-  npm run dev
-  # or
-  yarn dev
-  ```
-3. Open [http://localhost:4028](http://localhost:4028) with your browser to see the result.
-
-## 📁 Project Structure
-
-```
-nextjs/
-├── public/             # Static assets
-├── src/
-│   ├── app/            # App router components
-│   │   ├── layout.tsx  # Root layout component
-│   │   └── page.tsx    # Main page component
-│   ├── components/     # Reusable UI components
-│   ├── styles/         # Global styles and Tailwind configuration
-├── next.config.mjs     # Next.js configuration
-├── package.json        # Project dependencies and scripts
-├── postcss.config.js   # PostCSS configuration
-└── tailwind.config.js  # Tailwind CSS configuration
-
+```powershell
+npm install
+Copy-Item .env.example .env.local
+npm run dev
 ```
 
-## 🧩 Page Editing
+Update `.env.local` before using the admin sign-in. Generate a strong session secret with:
 
-You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+```
 
-## 🎨 Styling
+Set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `AUTH_SECRET` in `.env.local`. Then visit `http://localhost:4028/admin/login`. The signed, HTTP-only session expires after eight hours. Admin credentials and the signing secret are server-only.
 
-This project uses Tailwind CSS for styling with the following features:
-- Utility-first approach for rapid development
-- Custom theme configuration
-- Responsive design utilities
-- PostCSS and Autoprefixer integration
+`NEXT_PUBLIC_SITE_URL` is optional and enables absolute sitemap and canonical metadata URLs. `NEXT_PUBLIC_MAP_EMBED_URL` can replace the default approximate OpenStreetMap embed for the Lakeside demo area.
 
-## 📦 Available Scripts
+## Validation
 
-- `npm run dev` - Start development server on port 4028
-- `npm run build` - Build the application for production
-- `npm run start` - Start the development server
-- `npm run serve` - Start the production server
-- `npm run lint` - Run ESLint to check code quality
-- `npm run lint:fix` - Fix ESLint issues automatically
-- `npm run format` - Format code with Prettier
+```powershell
+npm run type-check
+npm run lint
+npm run build
+npm run start
+```
 
-## 📱 Deployment
+## Current implementation status
 
-Build the application for production:
-
-  ```bash
-  npm run build
-  ```
-
-## 📚 Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial
-
-You can check out the [Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## 🙏 Acknowledgments
-
-- Built with [Rocket.new](https://rocket.new)
-- Powered by Next.js and React
-- Styled with Tailwind CSS
-
-Built with ❤️ on Rocket.new
+- Existing landing page and menu styling retained, with Pokhara/Lakeside demo branding, sample NPR prices, route-safe section links, a real OpenStreetMap embed, and a working image fallback.
+- Admin dashboard route is protected by environment-configured credentials and an HMAC-signed, HTTP-only cookie session.
+- The dashboard intentionally displays no live business metrics until a database is configured.
+- Cart, ordering, reservation persistence, contact submissions, review management, and admin CRUD are not implemented yet. The reservation and order UI does not report simulated success.
+- Prisma/MySQL, database migrations, and seed data still need to be added before this demo can accept or manage real business data.

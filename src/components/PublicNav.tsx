@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AppLogo from '@/components/ui/AppLogo';
-import { Menu, X, LayoutDashboard } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/menu', label: 'Menu' },
-  { href: '#about', label: 'About' },
-  { href: '#gallery', label: 'Gallery' },
-  { href: '#contact', label: 'Contact' },
+  { href: '/#about', label: 'About' },
+  { href: '/#gallery', label: 'Gallery' },
+  { href: '/#contact', label: 'Contact' },
 ];
 
 interface PublicNavProps {
@@ -68,10 +68,11 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                   className={`px-4 py-2 text-sm font-500 rounded-lg transition-all duration-150 nav-link-underline ${
                     currentPath === link.href
                       ? scrolled
-                        ? 'text-primary font-600' :'text-accent font-600'
+                        ? 'text-primary font-600'
+                        : 'text-accent font-600'
                       : scrolled
-                      ? 'text-foreground hover:text-primary hover:bg-secondary/60'
-                      : 'text-white/90 hover:text-white hover:bg-white/10'
+                        ? 'text-foreground hover:text-primary hover:bg-secondary/60'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   {link.label}
@@ -82,18 +83,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-3">
               <Link
-                href="/admin-dashboard"
-                className={`flex items-center gap-1.5 text-xs font-600 px-3 py-1.5 rounded-lg transition-all ${
-                  scrolled
-                    ? 'text-muted-foreground hover:text-primary hover:bg-secondary/60'
-                    : 'text-white/60 hover:text-white/90 hover:bg-white/10'
-                }`}
-              >
-                <LayoutDashboard size={13} />
-                Admin
-              </Link>
-              <Link
-                href="#booking"
+                href="/#booking"
                 className="flex items-center gap-2 bg-primary text-primary-foreground text-sm font-600 px-5 py-2.5 rounded-xl hover:bg-primary/90 active:scale-95 transition-all duration-150"
               >
                 Book a Table
@@ -104,9 +94,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className={`md:hidden p-2 rounded-lg transition-colors ${
-                scrolled
-                  ? 'text-foreground hover:bg-secondary'
-                  : 'text-white hover:bg-white/10'
+                scrolled ? 'text-foreground hover:bg-secondary' : 'text-white hover:bg-white/10'
               }`}
               aria-label="Toggle navigation menu"
             >
@@ -129,7 +117,8 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-500 transition-colors ${
                   currentPath === link.href
-                    ? 'bg-secondary text-primary font-600' :'text-foreground hover:bg-secondary/60'
+                    ? 'bg-secondary text-primary font-600'
+                    : 'text-foreground hover:bg-secondary/60'
                 }`}
               >
                 {link.label}
@@ -137,21 +126,13 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
             ))}
             <div className="pt-2 border-t border-border mt-2">
               <Link
-                href="#booking"
+                href="/#booking"
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center justify-center gap-2 bg-primary text-primary-foreground text-sm font-600 px-5 py-3 rounded-xl w-full hover:bg-primary/90 transition-all"
               >
                 Book a Table
               </Link>
             </div>
-            <Link
-              href="/admin-dashboard"
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-center gap-2 text-muted-foreground text-xs py-2 hover:text-primary transition-colors"
-            >
-              <LayoutDashboard size={13} />
-              Admin Dashboard
-            </Link>
           </div>
         </div>
       </nav>

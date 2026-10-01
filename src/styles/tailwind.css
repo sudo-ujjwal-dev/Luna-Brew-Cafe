@@ -3,34 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --background: #FDFAF6;
-  --foreground: #1C0F0A;
-  --primary: #8B5E3C;
-  --primary-foreground: #FDFAF6;
-  --secondary: #F5EDE0;
-  --secondary-foreground: #5C3D2E;
-  --accent: #F5A623;
-  --accent-foreground: #1C0F0A;
-  --muted: #EDE5D8;
-  --muted-foreground: #8A7060;
-  --card: #FFFFFF;
-  --card-foreground: #1C0F0A;
-  --border: #E2D5C3;
-  --input: #F0E8DA;
-  --ring: #8B5E3C;
+  --background: #fdfaf6;
+  --foreground: #1c0f0a;
+  --primary: #8b5e3c;
+  --primary-foreground: #fdfaf6;
+  --secondary: #f5ede0;
+  --secondary-foreground: #5c3d2e;
+  --accent: #f5a623;
+  --accent-foreground: #1c0f0a;
+  --muted: #ede5d8;
+  --muted-foreground: #8a7060;
+  --card: #ffffff;
+  --card-foreground: #1c0f0a;
+  --border: #e2d5c3;
+  --input: #f0e8da;
+  --ring: #8b5e3c;
   --radius: 0.75rem;
   --font-sans: var(--font-plus-jakarta-sans), sans-serif;
   --font-mono: var(--font-dm-mono), monospace;
 
   /* Semantic */
-  --success: #2D6A4F;
-  --success-bg: #D8F3DC;
-  --warning: #B5510A;
-  --warning-bg: #FFF3CD;
-  --danger: #9B2226;
-  --danger-bg: #FFE0E0;
-  --info: #1D4E89;
-  --info-bg: #DBE9FF;
+  --success: #2d6a4f;
+  --success-bg: #d8f3dc;
+  --warning: #b5510a;
+  --warning-bg: #fff3cd;
+  --danger: #9b2226;
+  --danger-bg: #ffe0e0;
+  --info: #1d4e89;
+  --info-bg: #dbe9ff;
 }
 
 @layer base {
@@ -51,11 +51,19 @@
     scroll-behavior: smooth;
   }
 
-  h1, h2, h3, h4, h5, h6, p {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
     margin: 0;
   }
 
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     font-family: var(--font-sans);
   }
 }
@@ -89,7 +97,9 @@
   }
 
   .card-hover {
-    transition: transform 200ms ease, box-shadow 200ms ease;
+    transition:
+      transform 200ms ease,
+      box-shadow 200ms ease;
   }
 
   .card-hover:hover {
@@ -150,13 +160,13 @@
   }
 
   .status-preparing {
-    background-color: #FFF0D6;
-    color: #9A5B00;
+    background-color: #fff0d6;
+    color: #9a5b00;
   }
 
   .status-ready {
-    background-color: #E8F5E9;
-    color: #1B5E20;
+    background-color: #e8f5e9;
+    color: #1b5e20;
   }
 
   .status-completed {
@@ -180,23 +190,23 @@
   }
 
   .dietary-vegan {
-    background-color: #D8F3DC;
-    color: #1B4332;
+    background-color: #d8f3dc;
+    color: #1b4332;
   }
 
   .dietary-gf {
-    background-color: #FFF3E0;
-    color: #BF360C;
+    background-color: #fff3e0;
+    color: #bf360c;
   }
 
   .dietary-spicy {
-    background-color: #FCE4EC;
-    color: #880E4F;
+    background-color: #fce4ec;
+    color: #880e4f;
   }
 
   .dietary-dairy-free {
-    background-color: #E3F2FD;
-    color: #0D47A1;
+    background-color: #e3f2fd;
+    color: #0d47a1;
   }
 
   .admin-sidebar-active {
@@ -210,19 +220,18 @@
   }
 
   .shimmer {
-    background: linear-gradient(
-      90deg,
-      var(--muted) 25%,
-      var(--secondary) 50%,
-      var(--muted) 75%
-    );
+    background: linear-gradient(90deg, var(--muted) 25%, var(--secondary) 50%, var(--muted) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }
 
   @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
   }
 
   .fade-in {
@@ -230,8 +239,14 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .section-label {

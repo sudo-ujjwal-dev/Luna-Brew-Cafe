@@ -1,9 +1,5 @@
-'use client';
-
-import React, { useState } from 'react';
 import AppImage from '@/components/ui/AppImage';
-import { Star, ShoppingCart } from 'lucide-react';
-import { toast } from 'sonner';
+import { ShoppingCart } from 'lucide-react';
 import type { MenuItem } from './MenuClient';
 
 const tagConfig: Record<string, { label: string; className: string }> = {
@@ -19,16 +15,6 @@ interface MenuItemCardProps {
 }
 
 export default function MenuItemCard({ item }: MenuItemCardProps) {
-  const [adding, setAdding] = useState(false);
-
-  const handleAddToCart = async () => {
-    // Backend integration point: POST /api/cart/add
-    setAdding(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setAdding(false);
-    toast.success(`${item.name} added to your order`);
-  };
-
   return (
     <article
       className={`bg-card rounded-2xl border border-border overflow-hidden card-hover group relative ${
@@ -57,16 +43,7 @@ export default function MenuItemCard({ item }: MenuItemCardProps) {
         )}
 
         {/* Featured ribbon */}
-        {item.featured && item.available && (
-          <div className="menu-card-ribbon">Featured</div>
-        )}
-
-        {/* Rating badge */}
-        <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-lg px-2 py-1">
-          <Star size={10} className="fill-accent text-accent" />
-          <span className="text-white text-xs font-600">{item.rating}</span>
-          <span className="text-white/60 text-xs">({item.reviewCount})</span>
-        </div>
+        {item.featured && item.available && <div className="menu-card-ribbon">Featured</div>}
       </div>
 
       {/* Content */}
@@ -77,7 +54,9 @@ export default function MenuItemCard({ item }: MenuItemCardProps) {
 
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="text-sm font-700 text-foreground leading-tight">{item.name}</h3>
-          <span className="price-tag text-primary text-base flex-shrink-0">${item.price.toFixed(2)}</span>
+          <span className="price-tag text-primary text-base flex-shrink-0">
+            Rs. {item.price.toLocaleString('en-NP')}
+          </span>
         </div>
 
         <p className="text-xs text-muted-foreground leading-relaxed mb-3 line-clamp-2">
@@ -100,20 +79,15 @@ export default function MenuItemCard({ item }: MenuItemCardProps) {
 
         {/* Action */}
         <button
-          onClick={handleAddToCart}
-          disabled={!item.available || adding}
+          disabled
           className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-600 transition-all duration-150 ${
             item.available
-              ? 'bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground active:scale-[0.98]'
+              ? 'bg-muted text-muted-foreground cursor-not-allowed'
               : 'bg-muted text-muted-foreground cursor-not-allowed'
-          } disabled:opacity-60`}
+          }`}
         >
-          {adding ? (
-            <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-          ) : (
-            <ShoppingCart size={14} />
-          )}
-          {adding ? 'Adding...' : item.available ? 'Add to Order' : 'Unavailable'}
+          <ShoppingCart size={14} />
+          {item.available ? 'Ordering not enabled in this demo' : 'Unavailable'}
         </button>
       </div>
     </article>
