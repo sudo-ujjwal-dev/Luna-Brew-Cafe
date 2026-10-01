@@ -6,6 +6,7 @@ import MenuClient from './components/MenuClient';
 
 export const metadata: Metadata = {
   title: 'Sample Menu — Luna Brew Café, Pokhara',
+  alternates: { canonical: '/menu' },
   description:
     'Browse sample coffee, tea, breakfast, café meals, and dessert items with example prices in Nepali rupees.',
 };

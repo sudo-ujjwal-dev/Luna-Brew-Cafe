@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AppLogo from '@/components/ui/AppLogo';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShoppingBag } from 'lucide-react';
+import { cartItemCount, readCart, subscribeToCart } from '@/lib/cart';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -20,11 +21,18 @@ interface PublicNavProps {
 export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const updateCartCount = () => setCartCount(cartItemCount(readCart()));
+    updateCartCount();
+    return subscribeToCart(updateCartCount);
   }, []);
 
   return (
@@ -83,6 +91,17 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-3">
               <Link
+                href="/cart"
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-600 transition-colors ${
+                  scrolled
+                    ? 'text-foreground hover:bg-secondary'
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                <ShoppingBag size={16} />
+                Cart{cartCount > 0 ? ` (${cartCount})` : ''}
+              </Link>
+              <Link
                 href="/#booking"
                 className="flex items-center gap-2 bg-primary text-primary-foreground text-sm font-600 px-5 py-2.5 rounded-xl hover:bg-primary/90 active:scale-95 transition-all duration-150"
               >
@@ -125,6 +144,14 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
               </Link>
             ))}
             <div className="pt-2 border-t border-border mt-2">
+              <Link
+                href="/cart"
+                onClick={() => setMobileOpen(false)}
+                className="mb-2 flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-600 text-foreground"
+              >
+                <ShoppingBag size={16} />
+                Cart{cartCount > 0 ? ` (${cartCount})` : ''}
+              </Link>
               <Link
                 href="/#booking"
                 onClick={() => setMobileOpen(false)}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock, MapPin, Mail } from 'lucide-react';
+import ContactMessageForm from './ContactMessageForm';
 
 const mapEmbedUrl =
   process.env.NEXT_PUBLIC_MAP_EMBED_URL ??
@@ -93,6 +94,7 @@ export default function HoursLocationSection() {
               ))}
             </ul>
           </div>
+          <ContactMessageForm />
         </div>
       </div>
     </section>

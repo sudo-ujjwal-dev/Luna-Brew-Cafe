@@ -14,6 +14,13 @@ interface BookingForm {
   message: string;
 }
 
+interface ReservationConfirmation {
+  id: string;
+  date: string;
+  time: string;
+  guestCount: number;
+}
+
 const timeSlots = [
   'slot-0800',
   'slot-0900',
@@ -32,23 +39,47 @@ const timeSlots = [
   const min = id.replace('slot-', '').slice(2);
   const h = hour > 12 ? hour - 12 : hour;
   const period = hour >= 12 ? 'PM' : 'AM';
-  return { id, label: `${h}:${min} ${period}` };
+  return { id, value: `${String(hour).padStart(2, '0')}:${min}`, label: `${h}:${min} ${period}` };
 });
 
 export default function BookingSection() {
   const [submissionError, setSubmissionError] = useState('');
+  const [confirmation, setConfirmation] = useState<ReservationConfirmation | null>(null);
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
+    reset,
   } = useForm<BookingForm>();
 
-  const today = new Date();
-  const minimumDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  const onSubmit = () => {
-    setSubmissionError(
-      'This portfolio demo does not save reservation requests yet. No booking has been made.'
-    );
+  const localDateParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kathmandu',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+  const minimumDate = `${localDateParts.find((part) => part.type === 'year')?.value}-${localDateParts.find((part) => part.type === 'month')?.value}-${localDateParts.find((part) => part.type === 'day')?.value}`;
+
+  const onSubmit = async (data: BookingForm) => {
+    setSubmissionError('');
+    try {
+      const response = await fetch('/api/reservations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = (await response.json()) as {
+        reservation?: ReservationConfirmation;
+        error?: string;
+      };
+      if (!response.ok || !result.reservation) {
+        throw new Error(result.error || 'Unable to save your reservation.');
+      }
+      setConfirmation(result.reservation);
+      reset();
+    } catch (error) {
+      setSubmissionError(error instanceof Error ? error.message : 'Unable to save your reservation.');
+    }
   };
 
   return (
@@ -62,8 +93,8 @@ export default function BookingSection() {
             </p>
             <h2 className="text-display font-700 text-white mb-4">Reserve Your Table</h2>
             <p className="text-white/60 leading-relaxed mb-8">
-              This fictional café concept is set in Lakeside, Pokhara. Its reservation service is
-              not connected to a booking system, so submissions are not accepted.
+              Request a table at our fictional Lakeside café. Requests are saved as pending until
+              the café administrator confirms them.
             </p>
 
             <div className="space-y-4">
@@ -71,17 +102,17 @@ export default function BookingSection() {
                 {
                   Icon: CalendarDays,
                   title: 'Choose a date',
-                  desc: 'The booking flow is a visual preview only',
+                  desc: 'Bookings must be made at least two hours ahead',
                 },
                 {
                   Icon: Users,
-                  title: 'Plan your visit',
-                  desc: 'Guest details are not stored by this demo',
+                  title: 'Groups up to 12',
+                  desc: 'Include any seating or dietary requests',
                 },
                 {
                   Icon: Clock,
-                  title: 'No confirmation is sent',
-                  desc: 'A live reservation service still needs to be configured',
+                  title: 'Request a reservation',
+                  desc: 'Requests are pending until reviewed by an administrator',
                 },
               ].map(({ Icon, title, desc }) => (
                 <div key={`booking-feature-${title}`} className="flex items-start gap-4">
@@ -99,10 +130,25 @@ export default function BookingSection() {
 
           {/* Form */}
           <div className="bg-card rounded-2xl border border-border p-6 md:p-8">
+            {confirmation ? (
+              <div role="status" className="py-8 text-center">
+                <h3 className="text-xl font-700 text-foreground">Reservation request saved</h3>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Request {confirmation.id} for {confirmation.guestCount} guests on {confirmation.date} at {confirmation.time} is pending review.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setConfirmation(null)}
+                  className="mt-6 text-sm font-600 text-primary hover:underline"
+                >
+                  Make another reservation
+                </button>
+              </div>
+            ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
               <h3 className="text-lg font-700 text-foreground mb-1">Book a Table</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Preview form only. Requests are not saved.
+                Required fields are marked with an asterisk.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -211,7 +257,7 @@ export default function BookingSection() {
                   >
                     <option value="">Select</option>
                     {timeSlots.map((slot) => (
-                      <option key={slot.id} value={slot.label}>
+                      <option key={slot.id} value={slot.value}>
                         {slot.label}
                       </option>
                     ))}
@@ -273,11 +319,13 @@ export default function BookingSection() {
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-700 py-3.5 rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Preview Reservation Form
+                {isSubmitting ? 'Saving reservation…' : 'Request reservation'}
               </button>
             </form>
+            )}
           </div>
         </div>
       </div>

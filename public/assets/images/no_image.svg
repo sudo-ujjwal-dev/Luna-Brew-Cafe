@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-labelledby="title">
   <title id="title">Image unavailable</title>
   <rect width="800" height="600" fill="#f3eee7"/>
-  <circle cx="400" cy="270" r="118" fill="#e2d4c5"/>
-  <path d="M320 238h145a18 18 0 0 1 18 18v65a73 73 0 0 1-73 73h-35a73 73 0 0 1-73-73v-65a18 18 0 0 1 18-18Z" fill="#8b5e3c"/>
-  <path d="M483 258h21a40 40 0 0 1 0 80h-28" fill="none" stroke="#8b5e3c" stroke-width="20"/>
-  <path d="M357 216c-12-17 13-22 0-40m49 40c-12-17 13-22 0-40m49 40c-12-17 13-22 0-40" fill="none" stroke="#8b5e3c" stroke-linecap="round" stroke-width="9"/>
-  <text x="400" y="455" fill="#5c493b" font-family="sans-serif" font-size="28" text-anchor="middle">Image unavailable</text>
+  <circle cx="400" cy="320" r="118" fill="#e2d4c5"/>
+  <path d="M320 288h145a18 18 0 0 1 18 18v65a73 73 0 0 1-73 73h-35a73 73 0 0 1-73-73v-65a18 18 0 0 1 18-18Z" fill="#8b5e3c"/>
+  <path d="M483 308h21a40 40 0 0 1 0 80h-28" fill="none" stroke="#8b5e3c" stroke-width="20"/>
+  <path d="M357 266c-12-17 13-22 0-40m49 40c-12-17 13-22 0-40m49 40c-12-17 13-22 0-40" fill="none" stroke="#8b5e3c" stroke-linecap="round" stroke-width="9"/>
+  <text x="400" y="550" fill="#5c493b" font-family="sans-serif" font-size="28" text-anchor="middle">Image unavailable</text>
 </svg>

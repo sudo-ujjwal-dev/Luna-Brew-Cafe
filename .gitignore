@@ -1,6 +1,7 @@
 # Node modules
 node_modules/
-package-lock.json
+.env.local
+.env.*.local
 
 # Next.js build output
 .next/

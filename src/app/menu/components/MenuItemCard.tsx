@@ -1,6 +1,10 @@
+'use client';
+
+import { useState } from 'react';
 import AppImage from '@/components/ui/AppImage';
 import { ShoppingCart } from 'lucide-react';
-import type { MenuItem } from './MenuClient';
+import type { MenuItem } from '@/lib/menu-types';
+import { addItemToCart } from '@/lib/cart';
 
 const tagConfig: Record<string, { label: string; className: string }> = {
   vegan: { label: 'Vegan', className: 'dietary-vegan' },
@@ -15,6 +19,14 @@ interface MenuItemCardProps {
 }
 
 export default function MenuItemCard({ item }: MenuItemCardProps) {
+  const [added, setAdded] = useState(false);
+
+  const handleAddToCart = () => {
+    addItemToCart(item.id);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1800);
+  };
+
   return (
     <article
       className={`bg-card rounded-2xl border border-border overflow-hidden card-hover group relative ${
@@ -79,15 +91,13 @@ export default function MenuItemCard({ item }: MenuItemCardProps) {
 
         {/* Action */}
         <button
-          disabled
-          className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-600 transition-all duration-150 ${
-            item.available
-              ? 'bg-muted text-muted-foreground cursor-not-allowed'
-              : 'bg-muted text-muted-foreground cursor-not-allowed'
-          }`}
+          type="button"
+          onClick={handleAddToCart}
+          disabled={!item.available}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-600 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground active:scale-[0.98] transition-all duration-150 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
         >
           <ShoppingCart size={14} />
-          {item.available ? 'Ordering not enabled in this demo' : 'Unavailable'}
+          {added ? 'Added to cart' : item.available ? 'Add to order' : 'Unavailable'}
         </button>
       </div>
     </article>

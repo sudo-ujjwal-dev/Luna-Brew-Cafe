@@ -8,15 +8,27 @@ import {
   MessageSquare,
 } from 'lucide-react';
 
-const kpiData = [
+export interface DashboardSummary {
+  todayRevenue: number;
+  todayOrders: number;
+  pendingOrders: number;
+  todayReservations: number;
+  activeMenuItems: number;
+  averageRating: number | null;
+  approvedReviews: number;
+  pendingReviews: number;
+}
+
+const currency = (value: number) =>
+  `Rs. ${value.toLocaleString('en-NP', { maximumFractionDigits: 2 })}`;
+
+function createKpiData(summary: DashboardSummary) {
+  return [
   {
     id: 'kpi-revenue',
     label: "Today's Revenue",
-    value: '—',
-    subValue: 'Database not connected',
-    trend: '',
-    trendUp: null,
-    trendLabel: '',
+    value: currency(summary.todayRevenue),
+    subValue: `${summary.todayOrders} orders today`,
     Icon: DollarSign,
     color: 'bg-success-bg',
     iconColor: 'text-success',
@@ -26,11 +38,8 @@ const kpiData = [
   {
     id: 'kpi-pending-orders',
     label: 'Pending Orders',
-    value: '—',
-    subValue: 'Database not connected',
-    trend: '',
-    trendUp: null,
-    trendLabel: '',
+    value: String(summary.pendingOrders),
+    subValue: 'Awaiting completion',
     Icon: ShoppingBag,
     color: 'bg-warning-bg',
     iconColor: 'text-warning',
@@ -41,11 +50,8 @@ const kpiData = [
   {
     id: 'kpi-reservations',
     label: "Today's Reservations",
-    value: '—',
-    subValue: 'Database not connected',
-    trend: '',
-    trendUp: null,
-    trendLabel: '',
+    value: String(summary.todayReservations),
+    subValue: 'Today',
     Icon: CalendarDays,
     color: 'bg-info-bg',
     iconColor: 'text-info',
@@ -55,11 +61,8 @@ const kpiData = [
   {
     id: 'kpi-menu',
     label: 'Active Menu Items',
-    value: '—',
-    subValue: 'Database not connected',
-    trend: '',
-    trendUp: null,
-    trendLabel: '',
+    value: String(summary.activeMenuItems),
+    subValue: 'Available now',
     Icon: UtensilsCrossed,
     color: 'bg-secondary',
     iconColor: 'text-primary',
@@ -69,11 +72,8 @@ const kpiData = [
   {
     id: 'kpi-rating',
     label: 'Avg Rating',
-    value: '—',
-    subValue: 'Database not connected',
-    trend: '',
-    trendUp: null,
-    trendLabel: '',
+    value: summary.averageRating === null ? '—' : summary.averageRating.toFixed(1),
+    subValue: `${summary.approvedReviews} approved reviews`,
     Icon: Star,
     color: 'bg-accent/10',
     iconColor: 'text-accent',
@@ -83,11 +83,8 @@ const kpiData = [
   {
     id: 'kpi-reviews',
     label: 'Pending Reviews',
-    value: '—',
-    subValue: 'Database not connected',
-    trend: '',
-    trendUp: null,
-    trendLabel: '',
+    value: String(summary.pendingReviews),
+    subValue: 'Awaiting moderation',
     Icon: MessageSquare,
     color: 'bg-danger-bg',
     iconColor: 'text-danger',
@@ -95,15 +92,21 @@ const kpiData = [
     alert: true,
     featured: false,
   },
-];
+  ];
+}
 
-export default function KPIBentoGrid() {
+interface KPIBentoGridProps {
+  summary: DashboardSummary;
+}
+
+export default function KPIBentoGrid({ summary }: KPIBentoGridProps) {
+  const kpiData = createKpiData(summary);
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-base font-700 text-foreground">Operations Overview</h2>
         <span className="text-xs text-muted-foreground font-mono-data">
-          No live records available
+          Live database summary
         </span>
       </div>
 
@@ -115,9 +118,6 @@ export default function KPIBentoGrid() {
             label,
             value,
             subValue,
-            trend,
-            trendUp,
-            trendLabel,
             Icon,
             color,
             iconColor,
@@ -138,19 +138,6 @@ export default function KPIBentoGrid() {
                 {value}
               </p>
               <p className="text-xs text-muted-foreground font-500">{subValue}</p>
-
-              {trend && (
-                <div className="flex items-center gap-1 mt-2">
-                  <span
-                    className={`text-xs font-600 ${
-                      trendUp === null ? 'text-warning' : 'text-success'
-                    }`}
-                  >
-                    {trend}
-                  </span>
-                  <span className="text-xs text-muted-foreground">{trendLabel}</span>
-                </div>
-              )}
             </div>
           )
         )}

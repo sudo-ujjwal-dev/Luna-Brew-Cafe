@@ -1,49 +1,43 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AppImage from '@/components/ui/AppImage';
 import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 
-const galleryImages = [
-  {
-    id: 'gal-001',
-    src: 'https://images.unsplash.com/photo-1635076870262-9893a73ecb45',
-    alt: 'Bright modern cafe interior with exposed brick walls, hanging plants, and white marble countertops',
-    category: 'Interior',
-    span: 'col-span-2 row-span-2',
-  },
-  {
-    id: 'gal-002',
-    src: 'https://images.unsplash.com/photo-1725394939762-59f74036a861',
-    alt: 'Flat lay of coffee brewing equipment including chemex, grinder, and freshly roasted beans',
-    category: 'Coffee',
-    span: 'col-span-1 row-span-1',
-  },
-  {
-    id: 'gal-003',
-    src: 'https://images.unsplash.com/photo-1725394939762-59f74036a861',
-    alt: 'Colorful brunch spread with eggs benedict, fresh fruit, and orange juice on a wooden table',
-    category: 'Food',
-    span: 'col-span-1 row-span-1',
-  },
-  {
-    id: 'gal-004',
-    src: 'https://images.unsplash.com/photo-1606168347215-38903eb09e0a',
-    alt: 'Close up of barista hands holding a coffee cup with intricate latte art rosette',
-    category: 'Coffee',
-    span: 'col-span-1 row-span-1',
-  },
-  {
-    id: 'gal-005',
-    src: 'https://images.unsplash.com/photo-1607962323824-e97780d3b9b6',
-    alt: 'Outdoor cafe terrace with string lights, potted plants, and customers enjoying evening coffee',
-    category: 'Exterior',
-    span: 'col-span-1 row-span-1',
-  },
-];
+interface GalleryImage {
+  id: string;
+  title: string;
+  src: string;
+  alt: string;
+  category: string;
+}
 
 export default function GalleryPreview() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/gallery', { signal: controller.signal })
+      .then(async (response) => {
+        const result = (await response.json()) as { images?: GalleryImage[]; error?: string };
+        if (!response.ok || !result.images) {
+          throw new Error(result.error || 'Gallery images are unavailable.');
+        }
+        setGalleryImages(result.images);
+      })
+      .catch((requestError: unknown) => {
+        if (!controller.signal.aborted) {
+          setError(requestError instanceof Error ? requestError.message : 'Gallery is unavailable.');
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, []);
 
   const openLightbox = (index: number) => setLightboxIndex(index);
   const closeLightbox = () => setLightboxIndex(null);
@@ -62,13 +56,15 @@ export default function GalleryPreview() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 grid-rows-2 gap-3 h-[480px] md:h-[520px]">
+        <div className="grid auto-rows-[140px] grid-cols-2 gap-3 md:auto-rows-[240px] md:grid-cols-3">
           {galleryImages.map((img, index) => (
             <button
               key={img.id}
               onClick={() => openLightbox(index)}
-              className={`relative overflow-hidden rounded-2xl group cursor-pointer ${img.span}`}
-              aria-label={`View gallery image: ${img.alt}`}
+              className={`relative overflow-hidden rounded-2xl group cursor-pointer ${
+                index === 0 ? 'col-span-2 row-span-2' : ''
+              }`}
+              aria-label={`View gallery image: ${img.title}`}
             >
               <AppImage
                 src={img.src}
@@ -91,6 +87,17 @@ export default function GalleryPreview() {
             </button>
           ))}
         </div>
+        {loading && (
+          <p role="status" className="py-8 text-center text-sm text-muted-foreground">
+            Loading gallery…
+          </p>
+        )}
+        {error && <p role="alert" className="py-8 text-center text-sm text-danger">{error}</p>}
+        {!loading && !error && galleryImages.length === 0 && (
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            Gallery images will appear here when they have been added.
+          </p>
+        )}
       </section>
 
       {/* Lightbox */}

@@ -4,12 +4,32 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import AppLogo from '@/components/ui/AppLogo';
-import { LayoutDashboard, ChevronLeft, ChevronRight, LogOut, Globe } from 'lucide-react';
+import {
+  LayoutDashboard,
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  Globe,
+  UtensilsCrossed,
+  ShoppingBag,
+  CalendarDays,
+  Star,
+  MessageSquare,
+  Images,
+} from 'lucide-react';
 
 const navGroups = [
   {
     label: 'Overview',
-    items: [{ href: '/admin-dashboard', label: 'Dashboard', Icon: LayoutDashboard, badge: null }],
+    items: [
+      { href: '/admin-dashboard', label: 'Dashboard', Icon: LayoutDashboard, badge: null },
+      { href: '/admin-dashboard/menu', label: 'Menu & categories', Icon: UtensilsCrossed, badge: null },
+      { href: '/admin-dashboard/orders', label: 'Orders', Icon: ShoppingBag, badge: null },
+      { href: '/admin-dashboard/reservations', label: 'Reservations', Icon: CalendarDays, badge: null },
+      { href: '/admin-dashboard/reviews', label: 'Reviews', Icon: Star, badge: null },
+      { href: '/admin-dashboard/messages', label: 'Messages', Icon: MessageSquare, badge: null },
+      { href: '/admin-dashboard/gallery', label: 'Gallery', Icon: Images, badge: null },
+    ],
   },
 ];
 
