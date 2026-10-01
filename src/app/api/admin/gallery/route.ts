@@ -7,7 +7,12 @@ export const dynamic = 'force-dynamic';
 
 const gallerySchema = z.object({
   title: z.string().trim().min(2).max(120),
-  imageUrl: z.string().trim().min(1).max(2048).refine((value) => value.startsWith('/') || /^https:\/\//i.test(value)),
+  imageUrl: z
+    .string()
+    .trim()
+    .min(1)
+    .max(2048)
+    .refine((value) => value.startsWith('/') || /^https:\/\//i.test(value)),
   altText: z.string().trim().min(2).max(255),
   category: z.string().trim().min(2).max(60),
   visible: z.boolean().default(true),
@@ -35,7 +40,10 @@ export async function POST(request: Request) {
 
   const parsed = gallerySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Check the image title, URL, alt text, and category.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Check the image title, URL, alt text, and category.' },
+      { status: 400 }
+    );
   }
   try {
     const image = await prisma.galleryImage.create({ data: parsed.data });

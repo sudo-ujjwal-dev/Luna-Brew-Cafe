@@ -19,7 +19,12 @@ export async function PATCH(request: Request, context: RouteContext) {
   } catch {
     return NextResponse.json({ error: 'Request body must be valid JSON.' }, { status: 400 });
   }
-  if (!body || typeof body !== 'object' || !('active' in body) || typeof body.active !== 'boolean') {
+  if (
+    !body ||
+    typeof body !== 'object' ||
+    !('active' in body) ||
+    typeof body.active !== 'boolean'
+  ) {
     return NextResponse.json({ error: 'Provide an active boolean value.' }, { status: 400 });
   }
 

@@ -17,7 +17,10 @@ export async function POST(request: Request) {
   const parsed = orderSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Check your order details and try again.', issues: formatValidationError(parsed.error) },
+      {
+        error: 'Check your order details and try again.',
+        issues: formatValidationError(parsed.error),
+      },
       { status: 400 }
     );
   }
@@ -49,13 +52,15 @@ export async function POST(request: Request) {
       );
     }
     const subtotal = orderLines.reduce(
-      (total, { selected, menuItem }) =>
-        total.plus(menuItem.price.mul(selected.quantity)),
+      (total, { selected, menuItem }) => total.plus(menuItem.price.mul(selected.quantity)),
       new Prisma.Decimal(0)
     );
     const settings =
       submitted.type === 'DELIVERY'
-        ? await prisma.businessSettings.findUnique({ where: { id: 'default' }, select: { deliveryFee: true } })
+        ? await prisma.businessSettings.findUnique({
+            where: { id: 'default' },
+            select: { deliveryFee: true },
+          })
         : null;
     const deliveryFee = settings?.deliveryFee ?? new Prisma.Decimal(0);
     const total = subtotal.plus(deliveryFee);

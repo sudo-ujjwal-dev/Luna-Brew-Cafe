@@ -20,7 +20,9 @@ export async function GET(request: Request) {
         where: {
           category: { active: true },
           ...(category && category !== 'all' ? { category: { slug: category, active: true } } : {}),
-          ...(query ? { OR: [{ name: { contains: query } }, { description: { contains: query } }] } : {}),
+          ...(query
+            ? { OR: [{ name: { contains: query } }, { description: { contains: query } }] }
+            : {}),
           ...(featuredOnly ? { featured: true } : {}),
         },
         include: { category: { select: { name: true, slug: true } } },

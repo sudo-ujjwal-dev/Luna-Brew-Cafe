@@ -70,7 +70,10 @@ export default async function OrderConfirmationPage({ searchParams }: OrderConfi
                 : 'No matching saved order was found for this confirmation.'}
             </p>
           )}
-          <Link href="/menu" className="mt-6 inline-flex rounded-xl bg-primary px-5 py-3 text-sm font-600 text-primary-foreground">
+          <Link
+            href="/menu"
+            className="mt-6 inline-flex rounded-xl bg-primary px-5 py-3 text-sm font-600 text-primary-foreground"
+          >
             Back to menu
           </Link>
         </div>

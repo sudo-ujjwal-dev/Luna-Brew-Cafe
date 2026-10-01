@@ -14,7 +14,12 @@ const updateSchema = z.object({
   description: z.string().trim().min(5).max(5000).optional(),
   price: z.coerce.number().finite().positive().max(1000000).optional(),
   categoryId: z.string().min(1).max(30).optional(),
-  image: z.string().trim().max(2048).refine((value) => !value || value.startsWith('/') || /^https:\/\//i.test(value)).optional(),
+  image: z
+    .string()
+    .trim()
+    .max(2048)
+    .refine((value) => !value || value.startsWith('/') || /^https:\/\//i.test(value))
+    .optional(),
   imageAlt: z.string().trim().max(255).optional(),
   available: z.boolean().optional(),
   featured: z.boolean().optional(),
@@ -38,7 +43,9 @@ async function readBody(request: Request) {
   try {
     return { body: (await request.json()) as unknown };
   } catch {
-    return { error: NextResponse.json({ error: 'Request body must be valid JSON.' }, { status: 400 }) };
+    return {
+      error: NextResponse.json({ error: 'Request body must be valid JSON.' }, { status: 400 }),
+    };
   }
 }
 
@@ -51,13 +58,19 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (parsedBody.error) return parsedBody.error;
   const parsed = updateSchema.safeParse(parsedBody.body);
   if (!parsed.success || Object.keys(parsed.data ?? {}).length === 0) {
-    return NextResponse.json({ error: 'Provide valid menu item fields to update.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Provide valid menu item fields to update.' },
+      { status: 400 }
+    );
   }
 
   try {
     const data = parsed.data;
     if (data.vegan && data.vegetarian === false) {
-      return NextResponse.json({ error: 'Vegan menu items must also be marked vegetarian.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Vegan menu items must also be marked vegetarian.' },
+        { status: 400 }
+      );
     }
     if (data.categoryId) {
       const category = await prisma.category.findUnique({
@@ -73,9 +86,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       ...data,
       ...(data.name ? { slug: createSlug(data.name) } : {}),
       ...(data.image !== undefined ? { image: data.image || null } : {}),
-      ...(data.imageAlt !== undefined || data.name
-        ? { imageAlt: data.imageAlt || data.name }
-        : {}),
+      ...(data.imageAlt !== undefined || data.name ? { imageAlt: data.imageAlt || data.name } : {}),
       ...(data.price !== undefined ? { price: data.price.toFixed(2) } : {}),
     };
     const item = await prisma.menuItem.update({
@@ -97,7 +108,10 @@ export async function PATCH(request: Request, context: RouteContext) {
       return NextResponse.json({ error: 'Menu item not found.' }, { status: 404 });
     }
     if (error instanceof Error && 'code' in error && error.code === 'P2002') {
-      return NextResponse.json({ error: 'A menu item with that name already exists.' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'A menu item with that name already exists.' },
+        { status: 409 }
+      );
     }
     console.error('Admin menu item update failed:', error);
     return NextResponse.json({ error: 'Unable to update this menu item.' }, { status: 503 });

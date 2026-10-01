@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import AdminLayout from '@/components/AdminLayout';
 import RecordManager from '../RecordManager';
 
-export const metadata: Metadata = { title: 'Contact messages — Luna Brew Admin', robots: { index: false } };
+export const metadata: Metadata = {
+  title: 'Contact messages — Luna Brew Admin',
+  robots: { index: false },
+};
 
 export default function AdminMessagesPage() {
   return (

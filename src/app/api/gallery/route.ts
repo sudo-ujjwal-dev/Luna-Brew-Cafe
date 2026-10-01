@@ -21,6 +21,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Public gallery query failed:', error);
-    return NextResponse.json({ error: 'Gallery images are temporarily unavailable.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Gallery images are temporarily unavailable.' },
+      { status: 503 }
+    );
   }
 }

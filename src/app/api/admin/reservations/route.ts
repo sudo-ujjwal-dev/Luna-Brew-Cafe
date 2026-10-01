@@ -21,6 +21,9 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error('Admin reservation query failed:', error);
-    return NextResponse.json({ error: 'Reservations are temporarily unavailable.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Reservations are temporarily unavailable.' },
+      { status: 503 }
+    );
   }
 }

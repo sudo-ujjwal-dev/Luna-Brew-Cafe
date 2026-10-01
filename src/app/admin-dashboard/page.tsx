@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import type { Order, Reservation } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import AdminLayout from '@/components/AdminLayout';
 import KPIBentoGrid, { type DashboardSummary } from './components/KPIBentoGrid';
@@ -11,6 +12,12 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = 'force-dynamic';
+
+type RecentOrder = Pick<Order, 'id' | 'orderNumber' | 'customerName' | 'total' | 'status'>;
+type UpcomingReservation = Pick<
+  Reservation,
+  'id' | 'customerName' | 'date' | 'time' | 'guestCount' | 'status'
+>;
 
 function pokharaDayRange() {
   const today = new Intl.DateTimeFormat('en-CA', {
@@ -27,8 +34,8 @@ function pokharaDayRange() {
 
 export default async function AdminDashboardPage() {
   let summary: DashboardSummary | null = null;
-  let recentOrders: Awaited<ReturnType<typeof prisma.order.findMany>> = [];
-  let upcomingReservations: Awaited<ReturnType<typeof prisma.reservation.findMany>> = [];
+  let recentOrders: RecentOrder[] = [];
+  let upcomingReservations: UpcomingReservation[] = [];
   try {
     const { start, end, today, nextDay } = pokharaDayRange();
     const [
@@ -42,61 +49,61 @@ export default async function AdminDashboardPage() {
       recentOrderRecords,
       upcomingReservationRecords,
     ] = await Promise.all([
-        prisma.order.aggregate({
-          where: { status: 'COMPLETED', createdAt: { gte: start, lt: end } },
-          _sum: { total: true },
-        }),
-        prisma.order.count({
-          where: { createdAt: { gte: start, lt: end }, status: { not: 'CANCELLED' } },
-        }),
-        prisma.order.count({
-          where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } },
-        }),
-        prisma.reservation.count({
-          where: {
-            date: {
-              gte: new Date(`${today}T00:00:00.000Z`),
-              lt: new Date(`${nextDay}T00:00:00.000Z`),
-            },
-            status: { in: ['PENDING', 'CONFIRMED'] },
+      prisma.order.aggregate({
+        where: { status: 'COMPLETED', createdAt: { gte: start, lt: end } },
+        _sum: { total: true },
+      }),
+      prisma.order.count({
+        where: { createdAt: { gte: start, lt: end }, status: { not: 'CANCELLED' } },
+      }),
+      prisma.order.count({
+        where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } },
+      }),
+      prisma.reservation.count({
+        where: {
+          date: {
+            gte: new Date(`${today}T00:00:00.000Z`),
+            lt: new Date(`${nextDay}T00:00:00.000Z`),
           },
-        }),
-        prisma.menuItem.count({ where: { available: true, category: { active: true } } }),
-        prisma.review.aggregate({
-          where: { status: 'APPROVED' },
-          _avg: { rating: true },
-          _count: { _all: true },
-        }),
-        prisma.review.count({ where: { status: 'PENDING' } }),
-        prisma.order.findMany({
-          take: 5,
-          orderBy: { createdAt: 'desc' },
-          select: {
-            id: true,
-            orderNumber: true,
-            customerName: true,
-            total: true,
-            status: true,
-            createdAt: true,
-          },
-        }),
-        prisma.reservation.findMany({
-          where: {
-            date: { gte: new Date(`${today}T00:00:00.000Z`) },
-            status: { in: ['PENDING', 'CONFIRMED'] },
-          },
-          take: 5,
-          orderBy: [{ date: 'asc' }, { time: 'asc' }],
-          select: {
-            id: true,
-            customerName: true,
-            date: true,
-            time: true,
-            guestCount: true,
-            status: true,
-          },
-        }),
-      ]);
+          status: { in: ['PENDING', 'CONFIRMED'] },
+        },
+      }),
+      prisma.menuItem.count({ where: { available: true, category: { active: true } } }),
+      prisma.review.aggregate({
+        where: { status: 'APPROVED' },
+        _avg: { rating: true },
+        _count: { _all: true },
+      }),
+      prisma.review.count({ where: { status: 'PENDING' } }),
+      prisma.order.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          orderNumber: true,
+          customerName: true,
+          total: true,
+          status: true,
+          createdAt: true,
+        },
+      }),
+      prisma.reservation.findMany({
+        where: {
+          date: { gte: new Date(`${today}T00:00:00.000Z`) },
+          status: { in: ['PENDING', 'CONFIRMED'] },
+        },
+        take: 5,
+        orderBy: [{ date: 'asc' }, { time: 'asc' }],
+        select: {
+          id: true,
+          customerName: true,
+          date: true,
+          time: true,
+          guestCount: true,
+          status: true,
+        },
+      }),
+    ]);
     recentOrders = recentOrderRecords;
     upcomingReservations = upcomingReservationRecords;
     summary = {
@@ -131,19 +138,33 @@ export default async function AdminDashboardPage() {
             <section className="overflow-hidden rounded-2xl border border-border bg-card">
               <div className="flex items-center justify-between border-b border-border px-5 py-4">
                 <h2 className="font-700 text-foreground">Recent orders</h2>
-                <Link href="/admin-dashboard/orders" className="text-sm font-600 text-primary hover:underline">View all</Link>
+                <Link
+                  href="/admin-dashboard/orders"
+                  className="text-sm font-600 text-primary hover:underline"
+                >
+                  View all
+                </Link>
               </div>
               {recentOrders.length === 0 ? (
                 <p className="p-5 text-sm text-muted-foreground">No orders have been placed yet.</p>
               ) : (
                 <ul className="divide-y divide-border">
                   {recentOrders.map((order) => (
-                    <li key={order.id} className="flex items-center justify-between gap-3 px-5 py-4">
+                    <li
+                      key={order.id}
+                      className="flex items-center justify-between gap-3 px-5 py-4"
+                    >
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-600 text-foreground">{order.customerName}</p>
-                        <p className="text-xs text-muted-foreground">#{order.orderNumber} · {order.status.replaceAll('_', ' ')}</p>
+                        <p className="truncate text-sm font-600 text-foreground">
+                          {order.customerName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          #{order.orderNumber} · {order.status.replaceAll('_', ' ')}
+                        </p>
                       </div>
-                      <p className="shrink-0 text-sm font-700 text-foreground">Rs. {order.total.toNumber().toLocaleString('en-NP')}</p>
+                      <p className="shrink-0 text-sm font-700 text-foreground">
+                        Rs. {order.total.toNumber().toLocaleString('en-NP')}
+                      </p>
                     </li>
                   ))}
                 </ul>
@@ -152,19 +173,36 @@ export default async function AdminDashboardPage() {
             <section className="overflow-hidden rounded-2xl border border-border bg-card">
               <div className="flex items-center justify-between border-b border-border px-5 py-4">
                 <h2 className="font-700 text-foreground">Upcoming reservations</h2>
-                <Link href="/admin-dashboard/reservations" className="text-sm font-600 text-primary hover:underline">View all</Link>
+                <Link
+                  href="/admin-dashboard/reservations"
+                  className="text-sm font-600 text-primary hover:underline"
+                >
+                  View all
+                </Link>
               </div>
               {upcomingReservations.length === 0 ? (
                 <p className="p-5 text-sm text-muted-foreground">No upcoming reservations.</p>
               ) : (
                 <ul className="divide-y divide-border">
                   {upcomingReservations.map((reservation) => (
-                    <li key={reservation.id} className="flex items-center justify-between gap-3 px-5 py-4">
+                    <li
+                      key={reservation.id}
+                      className="flex items-center justify-between gap-3 px-5 py-4"
+                    >
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-600 text-foreground">{reservation.customerName}</p>
-                        <p className="text-xs text-muted-foreground">{reservation.date.toLocaleDateString('en-NP', { timeZone: 'Asia/Kathmandu' })} · {reservation.time} · {reservation.guestCount} guests</p>
+                        <p className="truncate text-sm font-600 text-foreground">
+                          {reservation.customerName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {reservation.date.toLocaleDateString('en-NP', {
+                            timeZone: 'Asia/Kathmandu',
+                          })}{' '}
+                          · {reservation.time} · {reservation.guestCount} guests
+                        </p>
                       </div>
-                      <span className="shrink-0 text-xs font-600 text-muted-foreground">{reservation.status}</span>
+                      <span className="shrink-0 text-xs font-600 text-muted-foreground">
+                        {reservation.status}
+                      </span>
                     </li>
                   ))}
                 </ul>

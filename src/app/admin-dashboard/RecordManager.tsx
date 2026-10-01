@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export type RecordKind = 'orders' | 'reservations' | 'reviews' | 'contact';
 
@@ -13,14 +13,19 @@ interface RecordRow {
   created: string;
 }
 
-const config: Record<
-  RecordKind,
-  { collection: string; endpoint: string; statuses: string[] }
-> = {
+const config: Record<RecordKind, { collection: string; endpoint: string; statuses: string[] }> = {
   orders: {
     collection: 'orders',
     endpoint: '/api/admin/orders',
-    statuses: ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'COMPLETED', 'CANCELLED'],
+    statuses: [
+      'PENDING',
+      'CONFIRMED',
+      'PREPARING',
+      'READY',
+      'OUT_FOR_DELIVERY',
+      'COMPLETED',
+      'CANCELLED',
+    ],
   },
   reservations: {
     collection: 'reservations',
@@ -45,8 +50,10 @@ function text(value: unknown, fallback = '') {
 
 function normalizeRow(kind: RecordKind, row: Record<string, unknown>): RecordRow {
   if (kind === 'orders') {
-    const itemRows = Array.isArray(row.items) ? row.items as Record<string, unknown>[] : [];
-    const itemNames = itemRows.map((item) => `${text(item.itemName, 'Item')} × ${text(item.quantity, '1')}`).join(', ');
+    const itemRows = Array.isArray(row.items) ? (row.items as Record<string, unknown>[]) : [];
+    const itemNames = itemRows
+      .map((item) => `${text(item.itemName, 'Item')} × ${text(item.quantity, '1')}`)
+      .join(', ');
     const total = typeof row.total === 'number' ? `Rs. ${row.total.toLocaleString('en-NP')}` : '';
     return {
       id: text(row.id),
@@ -95,7 +102,7 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
   const [updatingId, setUpdatingId] = useState('');
   const current = config[kind];
 
-  async function loadRecords() {
+  const loadRecords = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -111,11 +118,11 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [current.collection, current.endpoint, kind]);
 
   useEffect(() => {
     void loadRecords();
-  }, [kind]);
+  }, [loadRecords]);
 
   async function updateStatus(row: RecordRow, status: string) {
     setUpdatingId(row.id);
@@ -132,7 +139,9 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
       setNotice('Record updated.');
       await loadRecords();
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Unable to update this record.');
+      setError(
+        requestError instanceof Error ? requestError.message : 'Unable to update this record.'
+      );
     } finally {
       setUpdatingId('');
     }
@@ -141,12 +150,18 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
   return (
     <div className="space-y-4">
       {(error || notice) && (
-        <p role={error ? 'alert' : 'status'} className={`rounded-xl p-4 text-sm ${error ? 'bg-danger-bg text-danger' : 'bg-success-bg text-success'}`}>
+        <p
+          role={error ? 'alert' : 'status'}
+          className={`rounded-xl p-4 text-sm ${error ? 'bg-danger-bg text-danger' : 'bg-success-bg text-success'}`}
+        >
           {error || notice}
         </p>
       )}
       {loading ? (
-        <p role="status" className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+        <p
+          role="status"
+          className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground"
+        >
           Loading {kind}…
         </p>
       ) : rows.length === 0 ? (
@@ -156,11 +171,16 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
       ) : (
         <div className="space-y-3">
           {rows.map((row) => (
-            <article key={row.id} className="grid gap-4 rounded-2xl border border-border bg-card p-5 md:grid-cols-[minmax(0,1fr)_220px]">
+            <article
+              key={row.id}
+              className="grid gap-4 rounded-2xl border border-border bg-card p-5 md:grid-cols-[minmax(0,1fr)_220px]"
+            >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <h2 className="font-700 text-foreground">{row.title}</h2>
-                  <span className="text-xs text-muted-foreground">{row.status.replaceAll('_', ' ')}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {row.status.replaceAll('_', ' ')}
+                  </span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">{row.subtitle}</p>
                 <p className="mt-2 break-words text-sm text-foreground">{row.detail}</p>
@@ -169,7 +189,10 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
                 </time>
               </div>
               <div>
-                <label htmlFor={`record-status-${row.id}`} className="mb-1.5 block text-xs font-600 text-muted-foreground">
+                <label
+                  htmlFor={`record-status-${row.id}`}
+                  className="mb-1.5 block text-xs font-600 text-muted-foreground"
+                >
                   Update status
                 </label>
                 <select
@@ -180,7 +203,9 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
                   className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground"
                 >
                   {current.statuses.map((status) => (
-                    <option value={status} key={status}>{status.replaceAll('_', ' ')}</option>
+                    <option value={status} key={status}>
+                      {status.replaceAll('_', ' ')}
+                    </option>
                   ))}
                 </select>
               </div>

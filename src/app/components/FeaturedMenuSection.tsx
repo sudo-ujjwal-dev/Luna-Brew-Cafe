@@ -60,7 +60,9 @@ export default function FeaturedMenuSection() {
           Loading featured menu…
         </p>
       ) : error ? (
-        <p role="alert" className="py-14 text-center text-sm text-muted-foreground">{error}</p>
+        <p role="alert" className="py-14 text-center text-sm text-muted-foreground">
+          {error}
+        </p>
       ) : items.length === 0 ? (
         <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           Featured menu items will appear here when the menu is set up.
@@ -86,7 +88,9 @@ export default function FeaturedMenuSection() {
                 <div className="flex items-start justify-between gap-2 mb-1.5">
                   <div>
                     <span className="text-xs text-muted-foreground font-500">{item.category}</span>
-                    <h3 className="text-base font-700 text-foreground leading-tight">{item.name}</h3>
+                    <h3 className="text-base font-700 text-foreground leading-tight">
+                      {item.name}
+                    </h3>
                   </div>
                   <span className="price-tag text-primary text-base flex-shrink-0">
                     Rs. {item.price.toLocaleString('en-NP')}

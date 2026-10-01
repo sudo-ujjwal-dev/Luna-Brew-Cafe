@@ -17,7 +17,8 @@ export default function CheckoutPage() {
           <p className="section-label">Luna Brew Café</p>
           <h1 className="mt-2 text-display font-800 text-foreground">Checkout</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Orders are stored only after the server confirms them. Payment is collected at the café or on delivery.
+            Orders are stored only after the server confirms them. Payment is collected at the café
+            or on delivery.
           </p>
           <CheckoutClient />
         </div>

@@ -43,7 +43,10 @@ export async function POST(request: Request) {
   }
   const parsed = categorySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Enter a valid category name and sort order.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Enter a valid category name and sort order.' },
+      { status: 400 }
+    );
   }
 
   const slug = parsed.data.name
@@ -52,17 +55,17 @@ export async function POST(request: Request) {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
-  if (!slug) return NextResponse.json({ error: 'Category name must contain letters or numbers.' }, { status: 400 });
+  if (!slug)
+    return NextResponse.json(
+      { error: 'Category name must contain letters or numbers.' },
+      { status: 400 }
+    );
 
   try {
     const category = await prisma.category.create({ data: { ...parsed.data, slug } });
     return NextResponse.json({ category }, { status: 201 });
   } catch (error) {
-    if (
-      error instanceof Error &&
-      'code' in error &&
-      error.code === 'P2002'
-    ) {
+    if (error instanceof Error && 'code' in error && error.code === 'P2002') {
       return NextResponse.json({ error: 'That category name already exists.' }, { status: 409 });
     }
     console.error('Admin category creation failed:', error);

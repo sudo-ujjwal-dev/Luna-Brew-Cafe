@@ -9,7 +9,13 @@ interface RouteContext {
 
 const galleryUpdateSchema = z.object({
   title: z.string().trim().min(2).max(120).optional(),
-  imageUrl: z.string().trim().min(1).max(2048).refine((value) => value.startsWith('/') || /^https:\/\//i.test(value)).optional(),
+  imageUrl: z
+    .string()
+    .trim()
+    .min(1)
+    .max(2048)
+    .refine((value) => value.startsWith('/') || /^https:\/\//i.test(value))
+    .optional(),
   altText: z.string().trim().min(2).max(255).optional(),
   category: z.string().trim().min(2).max(60).optional(),
   visible: z.boolean().optional(),

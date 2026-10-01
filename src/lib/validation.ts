@@ -61,13 +61,10 @@ export const orderSchema = z
     path: ['deliveryAddress'],
     message: 'Enter a delivery address.',
   })
-  .refine(
-    (order) => order.type === 'DELIVERY' || order.paymentMethod === 'PAY_AT_CAFE',
-    {
-      path: ['paymentMethod'],
-      message: 'Cash on delivery is only available for delivery orders.',
-    }
-  )
+  .refine((order) => order.type === 'DELIVERY' || order.paymentMethod === 'PAY_AT_CAFE', {
+    path: ['paymentMethod'],
+    message: 'Cash on delivery is only available for delivery orders.',
+  })
   .refine(
     (order) => new Set(order.items.map((item) => item.menuItemId)).size === order.items.length,
     { path: ['items'], message: 'Each menu item can only appear once in the order.' }

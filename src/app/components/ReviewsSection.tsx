@@ -85,7 +85,10 @@ export default function ReviewsSection() {
           <p className="section-label mb-2">Reviews</p>
           <h2 className="text-display font-700 text-foreground">Guest Reviews</h2>
           {total > 0 && averageRating !== null && (
-            <div className="mt-3 flex items-center justify-center gap-2" aria-label={`${averageRating.toFixed(1)} average rating from ${total} approved reviews`}>
+            <div
+              className="mt-3 flex items-center justify-center gap-2"
+              aria-label={`${averageRating.toFixed(1)} average rating from ${total} approved reviews`}
+            >
               <Star size={16} className="fill-accent text-accent" />
               <span className="font-700 text-foreground">{averageRating.toFixed(1)}</span>
               <span className="text-sm text-muted-foreground">from {total} approved reviews</span>
@@ -94,9 +97,13 @@ export default function ReviewsSection() {
         </div>
 
         {loading ? (
-          <p role="status" className="py-8 text-center text-sm text-muted-foreground">Loading reviews…</p>
+          <p role="status" className="py-8 text-center text-sm text-muted-foreground">
+            Loading reviews…
+          </p>
         ) : loadError ? (
-          <p role="alert" className="py-8 text-center text-sm text-danger">{loadError}</p>
+          <p role="alert" className="py-8 text-center text-sm text-danger">
+            {loadError}
+          </p>
         ) : reviews.length === 0 ? (
           <p className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
             No approved reviews yet. Reviews submitted below remain private until moderated.
@@ -104,8 +111,14 @@ export default function ReviewsSection() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {reviews.map((review) => (
-              <article key={review.id} className="bg-card rounded-2xl border border-border p-6 card-hover">
-                <div className="flex items-center gap-1" aria-label={`${review.rating} out of 5 stars`}>
+              <article
+                key={review.id}
+                className="bg-card rounded-2xl border border-border p-6 card-hover"
+              >
+                <div
+                  className="flex items-center gap-1"
+                  aria-label={`${review.rating} out of 5 stars`}
+                >
                   {Array.from({ length: 5 }, (_, index) => (
                     <Star
                       key={`${review.id}-${index}`}
@@ -114,9 +127,14 @@ export default function ReviewsSection() {
                     />
                   ))}
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{review.comment}</p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {review.comment}
+                </p>
                 <p className="mt-4 text-sm font-700 text-foreground">{review.customerName}</p>
-                <time className="mt-1 block text-xs text-muted-foreground" dateTime={review.createdAt}>
+                <time
+                  className="mt-1 block text-xs text-muted-foreground"
+                  dateTime={review.createdAt}
+                >
                   {new Date(review.createdAt).toLocaleDateString('en-NP')}
                 </time>
               </article>
@@ -130,27 +148,68 @@ export default function ReviewsSection() {
         >
           <h3 className="sm:col-span-2 text-lg font-700 text-foreground">Leave a review</h3>
           <div>
-            <label htmlFor="review-name" className="mb-1.5 block text-sm font-600 text-foreground">Your name</label>
-            <input id="review-name" name="customerName" required minLength={2} maxLength={120} className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+            <label htmlFor="review-name" className="mb-1.5 block text-sm font-600 text-foreground">
+              Your name
+            </label>
+            <input
+              id="review-name"
+              name="customerName"
+              required
+              minLength={2}
+              maxLength={120}
+              className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+            />
           </div>
           <div>
-            <label htmlFor="review-rating" className="mb-1.5 block text-sm font-600 text-foreground">Rating</label>
-            <select id="review-rating" name="rating" required className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm">
+            <label
+              htmlFor="review-rating"
+              className="mb-1.5 block text-sm font-600 text-foreground"
+            >
+              Rating
+            </label>
+            <select
+              id="review-rating"
+              name="rating"
+              required
+              className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+            >
               {[5, 4, 3, 2, 1].map((rating) => (
-                <option value={rating} key={rating}>{rating} {rating === 1 ? 'star' : 'stars'}</option>
+                <option value={rating} key={rating}>
+                  {rating} {rating === 1 ? 'star' : 'stars'}
+                </option>
               ))}
             </select>
           </div>
           <div className="sm:col-span-2">
-            <label htmlFor="review-comment" className="mb-1.5 block text-sm font-600 text-foreground">Your review</label>
-            <textarea id="review-comment" name="comment" required minLength={10} maxLength={3000} rows={4} className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+            <label
+              htmlFor="review-comment"
+              className="mb-1.5 block text-sm font-600 text-foreground"
+            >
+              Your review
+            </label>
+            <textarea
+              id="review-comment"
+              name="comment"
+              required
+              minLength={10}
+              maxLength={3000}
+              rows={4}
+              className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+            />
           </div>
           {(submitError || submitMessage) && (
-            <p role={submitError ? 'alert' : 'status'} className={`sm:col-span-2 text-sm ${submitError ? 'text-danger' : 'text-success'}`}>
+            <p
+              role={submitError ? 'alert' : 'status'}
+              className={`sm:col-span-2 text-sm ${submitError ? 'text-danger' : 'text-success'}`}
+            >
               {submitError || submitMessage}
             </p>
           )}
-          <button type="submit" disabled={submitting} className="sm:col-span-2 rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="sm:col-span-2 rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
+          >
             {submitting ? 'Submitting…' : 'Submit for review'}
           </button>
         </form>

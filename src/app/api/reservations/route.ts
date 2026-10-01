@@ -24,7 +24,10 @@ export async function POST(request: Request) {
   const parsed = reservationSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Check the reservation details and try again.', issues: formatValidationError(parsed.error) },
+      {
+        error: 'Check the reservation details and try again.',
+        issues: formatValidationError(parsed.error),
+      },
       { status: 400 }
     );
   }
@@ -72,6 +75,9 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     console.error('Reservation persistence failed:', error);
-    return NextResponse.json({ error: 'Unable to save the reservation right now.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Unable to save the reservation right now.' },
+      { status: 503 }
+    );
   }
 }

@@ -73,15 +73,25 @@ export async function POST(request: Request) {
   }
   const parsed = menuItemSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Check the menu item fields and try again.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Check the menu item fields and try again.' },
+      { status: 400 }
+    );
   }
 
   const data = parsed.data;
   if (data.vegan && !data.vegetarian) {
-    return NextResponse.json({ error: 'Vegan menu items must also be marked vegetarian.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Vegan menu items must also be marked vegetarian.' },
+      { status: 400 }
+    );
   }
   const slug = createSlug(data.name);
-  if (!slug) return NextResponse.json({ error: 'Item name must include letters or numbers.' }, { status: 400 });
+  if (!slug)
+    return NextResponse.json(
+      { error: 'Item name must include letters or numbers.' },
+      { status: 400 }
+    );
 
   try {
     const category = await prisma.category.findUnique({
@@ -105,7 +115,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ item: { ...item, price: item.price.toNumber() } }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'P2002') {
-      return NextResponse.json({ error: 'A menu item with that name already exists.' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'A menu item with that name already exists.' },
+        { status: 409 }
+      );
     }
     console.error('Admin menu item creation failed:', error);
     return NextResponse.json({ error: 'Unable to create this menu item.' }, { status: 503 });

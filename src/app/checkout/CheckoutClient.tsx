@@ -90,10 +90,18 @@ export default function CheckoutClient() {
   }
 
   if (loading) {
-    return <p role="status" className="py-16 text-center text-muted-foreground">Loading checkout…</p>;
+    return (
+      <p role="status" className="py-16 text-center text-muted-foreground">
+        Loading checkout…
+      </p>
+    );
   }
   if (error) {
-    return <p role="alert" className="mt-8 rounded-xl bg-danger-bg p-4 text-sm text-danger">{error}</p>;
+    return (
+      <p role="alert" className="mt-8 rounded-xl bg-danger-bg p-4 text-sm text-danger">
+        {error}
+      </p>
+    );
   }
   if (products.length === 0 || unavailableIds.length > 0) {
     return (
@@ -101,7 +109,10 @@ export default function CheckoutClient() {
         <p className="text-foreground">
           {unavailableIds.length ? 'Your cart has unavailable items.' : 'Your cart is empty.'}
         </p>
-        <Link href="/cart" className="mt-4 inline-flex text-sm font-600 text-primary hover:underline">
+        <Link
+          href="/cart"
+          className="mt-4 inline-flex text-sm font-600 text-primary hover:underline"
+        >
           Return to cart
         </Link>
       </div>
@@ -110,16 +121,24 @@ export default function CheckoutClient() {
 
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
-      <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-border bg-card p-5 sm:p-7">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-5 rounded-2xl border border-border bg-card p-5 sm:p-7"
+      >
         <fieldset className="space-y-3">
           <legend className="font-700 text-foreground">How would you like your order?</legend>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            {([
-              ['DINE_IN', 'Dine-in'],
-              ['TAKEAWAY', 'Takeaway'],
-              ['DELIVERY', 'Delivery'],
-            ] as const).map(([value, label]) => (
-              <label key={value} className={`cursor-pointer rounded-xl border p-3 text-sm ${orderType === value ? 'border-primary bg-primary/5 text-primary' : 'border-border text-foreground'}`}>
+            {(
+              [
+                ['DINE_IN', 'Dine-in'],
+                ['TAKEAWAY', 'Takeaway'],
+                ['DELIVERY', 'Delivery'],
+              ] as const
+            ).map(([value, label]) => (
+              <label
+                key={value}
+                className={`cursor-pointer rounded-xl border p-3 text-sm ${orderType === value ? 'border-primary bg-primary/5 text-primary' : 'border-border text-foreground'}`}
+              >
                 <input
                   type="radio"
                   name="orderType"
@@ -136,26 +155,87 @@ export default function CheckoutClient() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="checkout-name" className="mb-1.5 block text-sm font-600 text-foreground">Full name *</label>
-            <input id="checkout-name" name="customerName" required maxLength={120} autoComplete="name" className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+            <label
+              htmlFor="checkout-name"
+              className="mb-1.5 block text-sm font-600 text-foreground"
+            >
+              Full name *
+            </label>
+            <input
+              id="checkout-name"
+              name="customerName"
+              required
+              maxLength={120}
+              autoComplete="name"
+              className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+            />
           </div>
           <div>
-            <label htmlFor="checkout-phone" className="mb-1.5 block text-sm font-600 text-foreground">Phone *</label>
-            <input id="checkout-phone" name="phone" required maxLength={25} type="tel" autoComplete="tel" placeholder="+977 98X XXX XXXX" className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+            <label
+              htmlFor="checkout-phone"
+              className="mb-1.5 block text-sm font-600 text-foreground"
+            >
+              Phone *
+            </label>
+            <input
+              id="checkout-phone"
+              name="phone"
+              required
+              maxLength={25}
+              type="tel"
+              autoComplete="tel"
+              placeholder="+977 98X XXX XXXX"
+              className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+            />
           </div>
           <div className="sm:col-span-2">
-            <label htmlFor="checkout-email" className="mb-1.5 block text-sm font-600 text-foreground">Email (optional)</label>
-            <input id="checkout-email" name="email" maxLength={254} type="email" autoComplete="email" className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+            <label
+              htmlFor="checkout-email"
+              className="mb-1.5 block text-sm font-600 text-foreground"
+            >
+              Email (optional)
+            </label>
+            <input
+              id="checkout-email"
+              name="email"
+              maxLength={254}
+              type="email"
+              autoComplete="email"
+              className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+            />
           </div>
           {orderType === 'DELIVERY' && (
             <>
               <div className="sm:col-span-2">
-                <label htmlFor="delivery-address" className="mb-1.5 block text-sm font-600 text-foreground">Delivery address *</label>
-                <textarea id="delivery-address" name="deliveryAddress" required minLength={5} maxLength={1000} rows={3} autoComplete="street-address" className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+                <label
+                  htmlFor="delivery-address"
+                  className="mb-1.5 block text-sm font-600 text-foreground"
+                >
+                  Delivery address *
+                </label>
+                <textarea
+                  id="delivery-address"
+                  name="deliveryAddress"
+                  required
+                  minLength={5}
+                  maxLength={1000}
+                  rows={3}
+                  autoComplete="street-address"
+                  className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+                />
               </div>
               <div className="sm:col-span-2">
-                <label htmlFor="payment-method" className="mb-1.5 block text-sm font-600 text-foreground">Payment</label>
-                <select id="payment-method" name="paymentMethod" className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm">
+                <label
+                  htmlFor="payment-method"
+                  className="mb-1.5 block text-sm font-600 text-foreground"
+                >
+                  Payment
+                </label>
+                <select
+                  id="payment-method"
+                  name="paymentMethod"
+                  className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+                >
                   <option value="CASH_ON_DELIVERY">Cash on delivery</option>
                   <option value="PAY_AT_CAFE">Pay at café</option>
                 </select>
@@ -163,12 +243,24 @@ export default function CheckoutClient() {
             </>
           )}
           <div className="sm:col-span-2">
-            <label htmlFor="order-notes" className="mb-1.5 block text-sm font-600 text-foreground">Notes (optional)</label>
-            <textarea id="order-notes" name="notes" maxLength={2000} rows={2} className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+            <label htmlFor="order-notes" className="mb-1.5 block text-sm font-600 text-foreground">
+              Notes (optional)
+            </label>
+            <textarea
+              id="order-notes"
+              name="notes"
+              maxLength={2000}
+              rows={2}
+              className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+            />
           </div>
         </div>
 
-        {formError && <p role="alert" className="text-sm text-danger">{formError}</p>}
+        {formError && (
+          <p role="alert" className="text-sm text-danger">
+            {formError}
+          </p>
+        )}
         <button
           type="submit"
           disabled={submitting || (orderType === 'DELIVERY' && deliveryFee === null)}
@@ -183,7 +275,9 @@ export default function CheckoutClient() {
         <ul className="mt-4 space-y-3">
           {products.map(({ item, quantity }) => (
             <li key={item.id} className="flex justify-between gap-3 text-sm">
-              <span className="text-muted-foreground">{quantity} × {item.name}</span>
+              <span className="text-muted-foreground">
+                {quantity} × {item.name}
+              </span>
               <span className="shrink-0 text-foreground">{formatPrice(item.price * quantity)}</span>
             </li>
           ))}
@@ -195,13 +289,17 @@ export default function CheckoutClient() {
         <div className="mt-2 flex justify-between text-sm">
           <span className="text-muted-foreground">Delivery fee</span>
           <span className="text-foreground">
-            {orderType !== 'DELIVERY' ? formatPrice(0) : deliveryFee === null ? 'Loading…' : formatPrice(deliveryFee)}
+            {orderType !== 'DELIVERY'
+              ? formatPrice(0)
+              : deliveryFee === null
+                ? 'Loading…'
+                : formatPrice(deliveryFee)}
           </span>
         </div>
         <div className="mt-3 flex justify-between border-t border-border pt-3 font-700">
           <span className="text-foreground">Total</span>
           <span className="text-primary">
-            {formatPrice(subtotal + (orderType === 'DELIVERY' ? deliveryFee ?? 0 : 0))}
+            {formatPrice(subtotal + (orderType === 'DELIVERY' ? (deliveryFee ?? 0) : 0))}
           </span>
         </div>
       </aside>

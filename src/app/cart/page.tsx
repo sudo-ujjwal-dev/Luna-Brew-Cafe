@@ -20,7 +20,8 @@ export default function CartPage() {
           </Link>
           <h1 className="mt-4 text-display font-800 text-foreground">Your cart</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            This is a fictional café demo. The cart is stored in this browser until you place an order.
+            This is a fictional café demo. The cart is stored in this browser until you place an
+            order.
           </p>
           <CartClient />
         </div>

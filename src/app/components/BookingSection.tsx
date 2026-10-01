@@ -78,7 +78,9 @@ export default function BookingSection() {
       setConfirmation(result.reservation);
       reset();
     } catch (error) {
-      setSubmissionError(error instanceof Error ? error.message : 'Unable to save your reservation.');
+      setSubmissionError(
+        error instanceof Error ? error.message : 'Unable to save your reservation.'
+      );
     }
   };
 
@@ -134,7 +136,8 @@ export default function BookingSection() {
               <div role="status" className="py-8 text-center">
                 <h3 className="text-xl font-700 text-foreground">Reservation request saved</h3>
                 <p className="mt-3 text-sm text-muted-foreground">
-                  Request {confirmation.id} for {confirmation.guestCount} guests on {confirmation.date} at {confirmation.time} is pending review.
+                  Request {confirmation.id} for {confirmation.guestCount} guests on{' '}
+                  {confirmation.date} at {confirmation.time} is pending review.
                 </p>
                 <button
                   type="button"
@@ -145,186 +148,194 @@ export default function BookingSection() {
                 </button>
               </div>
             ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-              <h3 className="text-lg font-700 text-foreground mb-1">Book a Table</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Required fields are marked with an asterisk.
-              </p>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+                <h3 className="text-lg font-700 text-foreground mb-1">Book a Table</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Required fields are marked with an asterisk.
+                </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="booking-name"
-                    className="block text-sm font-600 text-foreground mb-1.5"
-                  >
-                    Full Name *
-                  </label>
-                  <input
-                    id="booking-name"
-                    type="text"
-                    placeholder="Maya Chen"
-                    className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
-                      errors.name ? 'border-danger' : 'border-border'
-                    }`}
-                    {...register('name', { required: 'Name is required' })}
-                  />
-                  {errors.name && <p className="text-xs text-danger mt-1">{errors.name.message}</p>}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="booking-name"
+                      className="block text-sm font-600 text-foreground mb-1.5"
+                    >
+                      Full Name *
+                    </label>
+                    <input
+                      id="booking-name"
+                      type="text"
+                      placeholder="Maya Chen"
+                      className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
+                        errors.name ? 'border-danger' : 'border-border'
+                      }`}
+                      {...register('name', { required: 'Name is required' })}
+                    />
+                    {errors.name && (
+                      <p className="text-xs text-danger mt-1">{errors.name.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="booking-phone"
+                      className="block text-sm font-600 text-foreground mb-1.5"
+                    >
+                      Phone Number *
+                    </label>
+                    <input
+                      id="booking-phone"
+                      type="tel"
+                      placeholder="+977 98X XXX XXXX"
+                      className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
+                        errors.phone ? 'border-danger' : 'border-border'
+                      }`}
+                      {...register('phone', { required: 'Phone number is required' })}
+                    />
+                    {errors.phone && (
+                      <p className="text-xs text-danger mt-1">{errors.phone.message}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div>
                   <label
-                    htmlFor="booking-phone"
+                    htmlFor="booking-email"
                     className="block text-sm font-600 text-foreground mb-1.5"
                   >
-                    Phone Number *
+                    Email Address *
                   </label>
                   <input
-                    id="booking-phone"
-                    type="tel"
-                    placeholder="+977 98X XXX XXXX"
+                    id="booking-email"
+                    type="email"
+                    placeholder="you@email.com"
                     className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
-                      errors.phone ? 'border-danger' : 'border-border'
+                      errors.email ? 'border-danger' : 'border-border'
                     }`}
-                    {...register('phone', { required: 'Phone number is required' })}
-                  />
-                  {errors.phone && (
-                    <p className="text-xs text-danger mt-1">{errors.phone.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="booking-email"
-                  className="block text-sm font-600 text-foreground mb-1.5"
-                >
-                  Email Address *
-                </label>
-                <input
-                  id="booking-email"
-                  type="email"
-                  placeholder="you@email.com"
-                  className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
-                    errors.email ? 'border-danger' : 'border-border'
-                  }`}
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: 'Enter a valid email',
-                    },
-                  })}
-                />
-                {errors.email && <p className="text-xs text-danger mt-1">{errors.email.message}</p>}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label
-                    htmlFor="booking-date"
-                    className="block text-sm font-600 text-foreground mb-1.5"
-                  >
-                    Date *
-                  </label>
-                  <input
-                    id="booking-date"
-                    type="date"
-                    className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
-                      errors.date ? 'border-danger' : 'border-border'
-                    }`}
-                    min={minimumDate}
-                    {...register('date', {
-                      required: 'Date is required',
-                      min: { value: minimumDate, message: 'Choose today or a future date' },
+                    {...register('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: 'Enter a valid email',
+                      },
                     })}
                   />
-                  {errors.date && <p className="text-xs text-danger mt-1">{errors.date.message}</p>}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="booking-time"
-                    className="block text-sm font-600 text-foreground mb-1.5"
-                  >
-                    Time *
-                  </label>
-                  <select
-                    id="booking-time"
-                    className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
-                      errors.time ? 'border-danger' : 'border-border'
-                    }`}
-                    {...register('time', { required: 'Time is required' })}
-                  >
-                    <option value="">Select</option>
-                    {timeSlots.map((slot) => (
-                      <option key={slot.id} value={slot.value}>
-                        {slot.label}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.time && <p className="text-xs text-danger mt-1">{errors.time.message}</p>}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="booking-guests"
-                    className="block text-sm font-600 text-foreground mb-1.5"
-                  >
-                    Guests *
-                  </label>
-                  <select
-                    id="booking-guests"
-                    className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
-                      errors.guests ? 'border-danger' : 'border-border'
-                    }`}
-                    {...register('guests', { required: 'Guest count is required' })}
-                  >
-                    <option value="">Select</option>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
-                      <option key={`guest-${n}`} value={n}>
-                        {n} {n === 1 ? 'guest' : 'guests'}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.guests && (
-                    <p className="text-xs text-danger mt-1">{errors.guests.message}</p>
+                  {errors.email && (
+                    <p className="text-xs text-danger mt-1">{errors.email.message}</p>
                   )}
                 </div>
-              </div>
 
-              <div>
-                <label
-                  htmlFor="booking-message"
-                  className="block text-sm font-600 text-foreground mb-1.5"
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label
+                      htmlFor="booking-date"
+                      className="block text-sm font-600 text-foreground mb-1.5"
+                    >
+                      Date *
+                    </label>
+                    <input
+                      id="booking-date"
+                      type="date"
+                      className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
+                        errors.date ? 'border-danger' : 'border-border'
+                      }`}
+                      min={minimumDate}
+                      {...register('date', {
+                        required: 'Date is required',
+                        min: { value: minimumDate, message: 'Choose today or a future date' },
+                      })}
+                    />
+                    {errors.date && (
+                      <p className="text-xs text-danger mt-1">{errors.date.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="booking-time"
+                      className="block text-sm font-600 text-foreground mb-1.5"
+                    >
+                      Time *
+                    </label>
+                    <select
+                      id="booking-time"
+                      className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
+                        errors.time ? 'border-danger' : 'border-border'
+                      }`}
+                      {...register('time', { required: 'Time is required' })}
+                    >
+                      <option value="">Select</option>
+                      {timeSlots.map((slot) => (
+                        <option key={slot.id} value={slot.value}>
+                          {slot.label}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.time && (
+                      <p className="text-xs text-danger mt-1">{errors.time.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="booking-guests"
+                      className="block text-sm font-600 text-foreground mb-1.5"
+                    >
+                      Guests *
+                    </label>
+                    <select
+                      id="booking-guests"
+                      className={`w-full bg-input border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all ${
+                        errors.guests ? 'border-danger' : 'border-border'
+                      }`}
+                      {...register('guests', { required: 'Guest count is required' })}
+                    >
+                      <option value="">Select</option>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+                        <option key={`guest-${n}`} value={n}>
+                          {n} {n === 1 ? 'guest' : 'guests'}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.guests && (
+                      <p className="text-xs text-danger mt-1">{errors.guests.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="booking-message"
+                    className="block text-sm font-600 text-foreground mb-1.5"
+                  >
+                    Special Requests
+                  </label>
+                  <p className="text-xs text-muted-foreground mb-1.5">
+                    Dietary needs, occasion, seating preferences
+                  </p>
+                  <textarea
+                    id="booking-message"
+                    rows={3}
+                    placeholder="e.g. Birthday celebration, window seat preferred, nut allergy"
+                    className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all resize-none"
+                    {...register('message')}
+                  />
+                </div>
+
+                {submissionError && (
+                  <p role="alert" className="text-sm text-danger">
+                    {submissionError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-700 py-3.5 rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Special Requests
-                </label>
-                <p className="text-xs text-muted-foreground mb-1.5">
-                  Dietary needs, occasion, seating preferences
-                </p>
-                <textarea
-                  id="booking-message"
-                  rows={3}
-                  placeholder="e.g. Birthday celebration, window seat preferred, nut allergy"
-                  className="w-full bg-input border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10 transition-all resize-none"
-                  {...register('message')}
-                />
-              </div>
-
-              {submissionError && (
-                <p role="alert" className="text-sm text-danger">
-                  {submissionError}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-700 py-3.5 rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Saving reservation…' : 'Request reservation'}
-              </button>
-            </form>
+                  {isSubmitting ? 'Saving reservation…' : 'Request reservation'}
+                </button>
+              </form>
             )}
           </div>
         </div>

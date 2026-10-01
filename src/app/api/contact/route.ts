@@ -15,7 +15,10 @@ export async function POST(request: Request) {
   const parsed = contactMessageSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Check the message details and try again.', issues: formatValidationError(parsed.error) },
+      {
+        error: 'Check the message details and try again.',
+        issues: formatValidationError(parsed.error),
+      },
       { status: 400 }
     );
   }

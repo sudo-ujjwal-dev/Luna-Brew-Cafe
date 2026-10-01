@@ -32,46 +32,114 @@ export default function ContactMessageForm() {
       formElement.reset();
       setMessageSent(true);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : 'Unable to save your message.');
+      setError(
+        requestError instanceof Error ? requestError.message : 'Unable to save your message.'
+      );
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <form onSubmit={submitMessage} className="space-y-4 rounded-2xl border border-border bg-card p-6">
+    <form
+      onSubmit={submitMessage}
+      className="space-y-4 rounded-2xl border border-border bg-card p-6"
+    >
       <div>
         <h3 className="font-700 text-foreground">Send a message</h3>
-        <p className="mt-1 text-xs text-muted-foreground">Your message is stored for the demo administrator to review.</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Your message is stored for the demo administrator to review.
+        </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="contact-name" className="mb-1.5 block text-sm font-600 text-foreground">Name</label>
-          <input id="contact-name" name="name" required minLength={2} maxLength={120} autoComplete="name" className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+          <label htmlFor="contact-name" className="mb-1.5 block text-sm font-600 text-foreground">
+            Name
+          </label>
+          <input
+            id="contact-name"
+            name="name"
+            required
+            minLength={2}
+            maxLength={120}
+            autoComplete="name"
+            className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+          />
         </div>
         <div>
-          <label htmlFor="contact-email" className="mb-1.5 block text-sm font-600 text-foreground">Email</label>
-          <input id="contact-email" name="email" type="email" required maxLength={254} autoComplete="email" className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+          <label htmlFor="contact-email" className="mb-1.5 block text-sm font-600 text-foreground">
+            Email
+          </label>
+          <input
+            id="contact-email"
+            name="email"
+            type="email"
+            required
+            maxLength={254}
+            autoComplete="email"
+            className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+          />
         </div>
         <div>
-          <label htmlFor="contact-phone" className="mb-1.5 block text-sm font-600 text-foreground">Phone (optional)</label>
-          <input id="contact-phone" name="phone" type="tel" maxLength={25} autoComplete="tel" className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+          <label htmlFor="contact-phone" className="mb-1.5 block text-sm font-600 text-foreground">
+            Phone (optional)
+          </label>
+          <input
+            id="contact-phone"
+            name="phone"
+            type="tel"
+            maxLength={25}
+            autoComplete="tel"
+            className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+          />
         </div>
         <div>
-          <label htmlFor="contact-subject" className="mb-1.5 block text-sm font-600 text-foreground">Subject</label>
-          <input id="contact-subject" name="subject" required minLength={3} maxLength={160} className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+          <label
+            htmlFor="contact-subject"
+            className="mb-1.5 block text-sm font-600 text-foreground"
+          >
+            Subject
+          </label>
+          <input
+            id="contact-subject"
+            name="subject"
+            required
+            minLength={3}
+            maxLength={160}
+            className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+          />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="contact-message" className="mb-1.5 block text-sm font-600 text-foreground">Message</label>
-          <textarea id="contact-message" name="message" required minLength={10} maxLength={5000} rows={4} className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm" />
+          <label
+            htmlFor="contact-message"
+            className="mb-1.5 block text-sm font-600 text-foreground"
+          >
+            Message
+          </label>
+          <textarea
+            id="contact-message"
+            name="message"
+            required
+            minLength={10}
+            maxLength={5000}
+            rows={4}
+            className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm"
+          />
         </div>
       </div>
       {(error || messageSent) && (
-        <p role={error ? 'alert' : 'status'} className={`text-sm ${error ? 'text-danger' : 'text-success'}`}>
+        <p
+          role={error ? 'alert' : 'status'}
+          className={`text-sm ${error ? 'text-danger' : 'text-success'}`}
+        >
           {error || 'Your message was saved successfully.'}
         </p>
       )}
-      <button type="submit" disabled={submitting} className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60">
+      <button
+        type="submit"
+        disabled={submitting}
+        className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
+      >
         {submitting ? 'Sending…' : 'Send message'}
       </button>
     </form>

@@ -59,17 +59,14 @@ export default function MenuClient() {
 
   const toggleDietaryFilter = (slug: string) => {
     setActiveDietaryFilters((previous) =>
-      previous.includes(slug)
-        ? previous.filter((filter) => filter !== slug)
-        : [...previous, slug]
+      previous.includes(slug) ? previous.filter((filter) => filter !== slug) : [...previous, slug]
     );
   };
 
   const filteredItems = useMemo(
     () =>
       items.filter((item) => {
-        const matchesCategory =
-          activeCategory === 'all' || item.categorySlug === activeCategory;
+        const matchesCategory = activeCategory === 'all' || item.categorySlug === activeCategory;
         const query = searchQuery.trim().toLowerCase();
         const matchesSearch =
           !query ||
@@ -79,10 +76,7 @@ export default function MenuClient() {
           activeDietaryFilters.length === 0 ||
           activeDietaryFilters.every((filter) => item.tags.includes(filter));
         return (
-          matchesCategory &&
-          matchesSearch &&
-          matchesDietary &&
-          (showUnavailable || item.available)
+          matchesCategory && matchesSearch && matchesDietary && (showUnavailable || item.available)
         );
       }),
     [items, activeCategory, searchQuery, activeDietaryFilters, showUnavailable]

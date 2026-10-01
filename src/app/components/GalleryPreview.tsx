@@ -30,7 +30,9 @@ export default function GalleryPreview() {
       })
       .catch((requestError: unknown) => {
         if (!controller.signal.aborted) {
-          setError(requestError instanceof Error ? requestError.message : 'Gallery is unavailable.');
+          setError(
+            requestError instanceof Error ? requestError.message : 'Gallery is unavailable.'
+          );
         }
       })
       .finally(() => {
@@ -92,7 +94,11 @@ export default function GalleryPreview() {
             Loading gallery…
           </p>
         )}
-        {error && <p role="alert" className="py-8 text-center text-sm text-danger">{error}</p>}
+        {error && (
+          <p role="alert" className="py-8 text-center text-sm text-danger">
+            {error}
+          </p>
+        )}
         {!loading && !error && galleryImages.length === 0 && (
           <p className="py-8 text-center text-sm text-muted-foreground">
             Gallery images will appear here when they have been added.

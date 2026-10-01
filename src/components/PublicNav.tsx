@@ -93,9 +93,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
               <Link
                 href="/cart"
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-600 transition-colors ${
-                  scrolled
-                    ? 'text-foreground hover:bg-secondary'
-                    : 'text-white hover:bg-white/10'
+                  scrolled ? 'text-foreground hover:bg-secondary' : 'text-white hover:bg-white/10'
                 }`}
               >
                 <ShoppingBag size={16} />

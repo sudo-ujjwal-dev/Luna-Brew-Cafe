@@ -16,6 +16,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ messages });
   } catch (error) {
     console.error('Admin contact message query failed:', error);
-    return NextResponse.json({ error: 'Contact messages are temporarily unavailable.' }, { status: 503 });
+    return NextResponse.json(
+      { error: 'Contact messages are temporarily unavailable.' },
+      { status: 503 }
+    );
   }
 }

@@ -23,9 +23,19 @@ const navGroups = [
     label: 'Overview',
     items: [
       { href: '/admin-dashboard', label: 'Dashboard', Icon: LayoutDashboard, badge: null },
-      { href: '/admin-dashboard/menu', label: 'Menu & categories', Icon: UtensilsCrossed, badge: null },
+      {
+        href: '/admin-dashboard/menu',
+        label: 'Menu & categories',
+        Icon: UtensilsCrossed,
+        badge: null,
+      },
       { href: '/admin-dashboard/orders', label: 'Orders', Icon: ShoppingBag, badge: null },
-      { href: '/admin-dashboard/reservations', label: 'Reservations', Icon: CalendarDays, badge: null },
+      {
+        href: '/admin-dashboard/reservations',
+        label: 'Reservations',
+        Icon: CalendarDays,
+        badge: null,
+      },
       { href: '/admin-dashboard/reviews', label: 'Reviews', Icon: Star, badge: null },
       { href: '/admin-dashboard/messages', label: 'Messages', Icon: MessageSquare, badge: null },
       { href: '/admin-dashboard/gallery', label: 'Gallery', Icon: Images, badge: null },
