@@ -52,7 +52,7 @@ Prisma uses MySQL. The schema covers admins, categories, menu items, reservation
 
 Public APIs persist reservations, orders, reviews, and contact submissions. Checkout recalculates item prices and delivery totals from current database records on the server. Reviews are private until approved. Admin pages and APIs require an authenticated session.
 
-Image references may be local public paths or HTTPS URLs; image uploading/storage is not configured. `NEXT_PUBLIC_MAP_EMBED_URL` optionally replaces the approximate OpenStreetMap Lakeside demo-area embed. Do not configure it with a precise address unless the café's actual location is known and authorized. `NEXT_PUBLIC_SITE_URL` optionally supplies the production origin for sitemap and canonical URLs.
+Image references may be local public paths or HTTPS URLs; image uploading/storage is not configured. The seeded menu images are local, openly licensed demo photos; see [IMAGE-CREDITS.md](./IMAGE-CREDITS.md). `NEXT_PUBLIC_MAP_EMBED_URL` optionally replaces the approximate OpenStreetMap Lakeside demo-area embed. Do not configure it with a precise address unless the café's actual location is known and authorized. `NEXT_PUBLIC_SITE_URL` optionally supplies the production origin for sitemap and canonical URLs.
 
 Without a reachable, migrated MySQL database the persisted features and database-driven dashboard are unavailable; the application reports these failures rather than simulating success. No payment gateway, email delivery, or distributed rate limiter is configured.
 
