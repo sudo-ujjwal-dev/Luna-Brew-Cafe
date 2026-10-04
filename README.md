@@ -9,26 +9,26 @@ A Next.js 15 café website and management-system portfolio demo for a fictional 
 
 ## Configure and run locally
 
-1. Install dependencies and copy the environment template:
+1. Install dependencies and copy the environment template to `.env` (Prisma CLI reads this file, and Next.js does too):
 
    ```powershell
    npm install
-   Copy-Item .env.example .env.local
+   Copy-Item .env.example .env
    ```
 
-2. Create a MySQL database, then set `DATABASE_URL` in `.env.local`. Use a URL-encoded username/password where needed, for example:
+2. Create a MySQL database, then set `DATABASE_URL` in `.env`. URL-encode any special characters in the username or password, for example:
 
    ```text
    DATABASE_URL="mysql://USER:PASSWORD@localhost:3306/luna_brew_cafe"
    ```
 
-3. Set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and a unique `AUTH_SECRET` of at least 32 characters. Generate a secret with:
+3. Set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and a unique `AUTH_SECRET` of at least 32 characters in `.env`. Generate a secret with:
 
    ```powershell
    node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
    ```
 
-   Admin sign-in uses these server-only environment variables and a signed, HTTP-only session cookie that expires after eight hours. Never commit `.env.local` or share the credentials.
+   Admin sign-in uses these server-only environment variables and a signed, HTTP-only session cookie that expires after eight hours. `.env` is ignored by Git; never commit it or share the credentials.
 
 4. Generate the Prisma client, apply migrations, and load clearly identified demo seed data:
 
