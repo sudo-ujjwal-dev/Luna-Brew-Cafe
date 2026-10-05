@@ -152,7 +152,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                 </>
               ) : (
                 <Link
-                  href="/account/login"
+                  href="/account/register"
                   className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-600 transition-colors ${
                     scrolled ? 'text-foreground hover:bg-secondary' : 'text-white hover:bg-white/10'
                   }`}
@@ -240,7 +240,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                 </>
               ) : (
                 <Link
-                  href="/account/login"
+                  href="/account/register"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-600 text-foreground"
                 >

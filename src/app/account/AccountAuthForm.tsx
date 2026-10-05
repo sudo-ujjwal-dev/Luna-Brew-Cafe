@@ -13,8 +13,12 @@ export default function AccountAuthForm({ mode }: { mode: 'login' | 'register' }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
-    setSubmitting(true);
     const values = new FormData(event.currentTarget);
+    if (registering && values.get('password') !== values.get('confirmPassword')) {
+      setError('Passwords do not match.');
+      return;
+    }
+    setSubmitting(true);
     try {
       const response = await fetch(`/api/account/${mode}`, {
         method: 'POST',
@@ -41,7 +45,7 @@ export default function AccountAuthForm({ mode }: { mode: 'login' | 'register' }
       {registering && (
         <div>
           <label htmlFor="customer-name" className="mb-1.5 block text-sm font-600 text-foreground">
-            Full name
+            Name
           </label>
           <input
             id="customer-name"
@@ -56,7 +60,7 @@ export default function AccountAuthForm({ mode }: { mode: 'login' | 'register' }
       )}
       <div>
         <label htmlFor="customer-email" className="mb-1.5 block text-sm font-600 text-foreground">
-          Email address
+          Email
         </label>
         <input
           id="customer-email"
@@ -89,6 +93,26 @@ export default function AccountAuthForm({ mode }: { mode: 'login' | 'register' }
           <p className="mt-1 text-xs text-muted-foreground">Use at least 12 characters.</p>
         )}
       </div>
+      {registering && (
+        <div>
+          <label
+            htmlFor="customer-confirm-password"
+            className="mb-1.5 block text-sm font-600 text-foreground"
+          >
+            Confirm password
+          </label>
+          <input
+            id="customer-confirm-password"
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={12}
+            maxLength={128}
+            className="w-full rounded-xl border border-border bg-input px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/10"
+          />
+        </div>
+      )}
       {error && (
         <p role="alert" className="text-sm text-danger">
           {error}
@@ -99,15 +123,15 @@ export default function AccountAuthForm({ mode }: { mode: 'login' | 'register' }
         disabled={submitting}
         className="w-full rounded-xl bg-primary py-3 text-sm font-700 text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {submitting ? 'Please wait…' : registering ? 'Create account' : 'Sign in'}
+        {submitting ? 'Please wait…' : registering ? 'Create Account' : 'Login'}
       </button>
       <p className="text-center text-sm text-muted-foreground">
-        {registering ? 'Already have an account?' : 'New to Luna Brew?'}{' '}
+        {registering ? 'Already have an account?' : "Don't have an account?"}{' '}
         <Link
           href={registering ? '/account/login' : '/account/register'}
           className="font-600 text-primary hover:underline"
         >
-          {registering ? 'Sign in' : 'Create an account'}
+          {registering ? 'Login' : 'Create one'}
         </Link>
       </p>
     </form>
