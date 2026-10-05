@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { formatValidationError, reservationSchema } from '@/lib/validation';
+import { getCustomerSession } from '@/lib/customer-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,15 +52,17 @@ export async function POST(request: Request) {
   }
 
   try {
+    const customer = await getCustomerSession();
     const reservation = await prisma.reservation.create({
       data: {
-        customerName: name,
+        customerName: customer?.name ?? name,
         phone,
-        email: email.toLowerCase(),
+        email: customer?.email ?? email.toLowerCase(),
         date: dateValue,
         time,
         guestCount: guests,
         specialRequest: message || null,
+        userId: customer?.id,
       },
       select: { id: true, status: true, date: true, time: true, guestCount: true },
     });

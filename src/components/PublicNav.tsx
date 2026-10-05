@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AppLogo from '@/components/ui/AppLogo';
-import { Menu, X, ShoppingBag } from 'lucide-react';
+import { Menu, X, ShoppingBag, UserRound } from 'lucide-react';
 import { cartItemCount, readCart, subscribeToCart } from '@/lib/cart';
+import { useRouter } from 'next/navigation';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -22,6 +23,9 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [customerName, setCustomerName] = useState<string | null>(null);
+  const [accountError, setAccountError] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -34,6 +38,37 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
     updateCartCount();
     return subscribeToCart(updateCartCount);
   }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch('/api/account/session', { signal: controller.signal })
+      .then(async (response) => {
+        const result = (await response.json()) as {
+          customer?: { name: string } | null;
+        };
+        if (response.ok) setCustomerName(result.customer?.name ?? null);
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted) {
+          console.error('Customer navigation session lookup failed:', error);
+        }
+      });
+    return () => controller.abort();
+  }, []);
+
+  async function logout() {
+    setAccountError('');
+    try {
+      const response = await fetch('/api/account/logout', { method: 'POST' });
+      if (!response.ok) throw new Error('Unable to sign out.');
+      setCustomerName(null);
+      setMobileOpen(false);
+      router.refresh();
+    } catch (error) {
+      console.error('Customer sign-out failed:', error);
+      setAccountError('Unable to sign out right now. Please try again.');
+    }
+  }
 
   return (
     <>
@@ -90,6 +125,42 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
 
             {/* Desktop CTA */}
             <div className="hidden md:flex items-center gap-3">
+              {customerName ? (
+                <>
+                  <Link
+                    href="/account"
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-600 transition-colors ${
+                      scrolled
+                        ? 'text-foreground hover:bg-secondary'
+                        : 'text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <UserRound size={16} />
+                    Account
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => void logout()}
+                    className={`rounded-lg px-3 py-2 text-sm font-600 transition-colors ${
+                      scrolled
+                        ? 'text-foreground hover:bg-secondary'
+                        : 'text-white hover:bg-white/10'
+                    }`}
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/account/login"
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-600 transition-colors ${
+                    scrolled ? 'text-foreground hover:bg-secondary' : 'text-white hover:bg-white/10'
+                  }`}
+                >
+                  <UserRound size={16} />
+                  Login / Create Account
+                </Link>
+              )}
               <Link
                 href="/cart"
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-600 transition-colors ${
@@ -122,11 +193,18 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
 
         {/* Mobile drawer */}
         <div
-          className={`md:hidden transition-all duration-300 overflow-hidden ${
-            mobileOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          className={`md:hidden transition-all duration-300 ${
+            mobileOpen
+              ? 'max-h-[75vh] overflow-y-auto opacity-100'
+              : 'max-h-0 overflow-hidden opacity-0'
           } bg-card border-t border-border`}
         >
           <div className="px-4 py-4 space-y-1">
+            {accountError && (
+              <p role="alert" className="px-4 py-2 text-sm text-danger">
+                {accountError}
+              </p>
+            )}
             {navLinks.map((link) => (
               <Link
                 key={`mobile-nav-${link.href}`}
@@ -141,7 +219,35 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                 {link.label}
               </Link>
             ))}
-            <div className="pt-2 border-t border-border mt-2">
+            <div className="mt-2 space-y-1 border-t border-border pt-2">
+              {customerName ? (
+                <>
+                  <Link
+                    href="/account"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-600 text-foreground"
+                  >
+                    <UserRound size={16} />
+                    Account
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => void logout()}
+                    className="w-full rounded-xl px-5 py-3 text-sm font-600 text-foreground hover:bg-secondary"
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/account/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center gap-2 rounded-xl border border-border px-5 py-3 text-sm font-600 text-foreground"
+                >
+                  <UserRound size={16} />
+                  Login / Create Account
+                </Link>
+              )}
               <Link
                 href="/cart"
                 onClick={() => setMobileOpen(false)}

@@ -5,12 +5,14 @@ import { useState, type FormEvent } from 'react';
 export default function ContactMessageForm() {
   const [error, setError] = useState('');
   const [messageSent, setMessageSent] = useState(false);
+  const [emailSent, setEmailSent] = useState<boolean | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function submitMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
     setMessageSent(false);
+    setEmailSent(null);
     setSubmitting(true);
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
@@ -27,10 +29,15 @@ export default function ContactMessageForm() {
           message: form.get('message'),
         }),
       });
-      const result = (await response.json()) as { error?: string };
+      const result = (await response.json()) as {
+        error?: string;
+        emailSent?: boolean;
+        emailStatus?: string;
+      };
       if (!response.ok) throw new Error(result.error || 'Unable to save your message.');
       formElement.reset();
       setMessageSent(true);
+      setEmailSent(result.emailSent === true);
     } catch (requestError) {
       setError(
         requestError instanceof Error ? requestError.message : 'Unable to save your message.'
@@ -48,7 +55,7 @@ export default function ContactMessageForm() {
       <div>
         <h3 className="font-700 text-foreground">Send a message</h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Your message is stored for the demo administrator to review.
+          Message the café team at lumlelyujjwal@gmail.com.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -132,7 +139,10 @@ export default function ContactMessageForm() {
           role={error ? 'alert' : 'status'}
           className={`text-sm ${error ? 'text-danger' : 'text-success'}`}
         >
-          {error || 'Your message was saved successfully.'}
+          {error ||
+            (emailSent
+              ? 'Your message was saved and emailed to the café team.'
+              : 'Your message was saved in the admin inbox, but email delivery is not configured or is currently unavailable.')}
         </p>
       )}
       <button

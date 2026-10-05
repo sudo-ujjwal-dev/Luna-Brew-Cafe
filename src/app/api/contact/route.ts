@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { contactMessageSchema, formatValidationError } from '@/lib/validation';
+import { getCustomerSession } from '@/lib/customer-auth';
+import { sendContactNotification } from '@/lib/contact-email';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,15 +26,26 @@ export async function POST(request: Request) {
   }
 
   try {
+    const customer = await getCustomerSession();
     const message = await prisma.contactMessage.create({
       data: {
         ...parsed.data,
         email: parsed.data.email.toLowerCase(),
         phone: parsed.data.phone || null,
+        userId: customer?.id,
       },
       select: { id: true, createdAt: true },
     });
-    return NextResponse.json({ received: true, messageId: message.id }, { status: 201 });
+    const delivery = await sendContactNotification(parsed.data);
+    return NextResponse.json(
+      {
+        received: true,
+        messageId: message.id,
+        emailSent: delivery.sent,
+        ...(delivery.sent ? {} : { emailStatus: delivery.reason }),
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Contact message persistence failed:', error);
     return NextResponse.json({ error: 'Unable to save your message right now.' }, { status: 503 });

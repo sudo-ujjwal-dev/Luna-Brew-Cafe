@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { formatValidationError, orderSchema } from '@/lib/validation';
+import { getCustomerSession } from '@/lib/customer-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,7 @@ export async function POST(request: Request) {
 
   try {
     const submitted = parsed.data;
+    const customer = await getCustomerSession();
     const requestedIds = submitted.items.map((item) => item.menuItemId);
     const menuItems = await prisma.menuItem.findMany({
       where: { id: { in: requestedIds }, available: true, category: { active: true } },
@@ -73,6 +75,13 @@ export async function POST(request: Request) {
         customerName: submitted.customerName,
         phone: submitted.phone,
         email: submitted.email ? submitted.email.toLowerCase() : null,
+        ...(customer
+          ? {
+              userId: customer.id,
+              customerName: customer.name,
+              email: customer.email,
+            }
+          : {}),
         type: submitted.type,
         paymentMethod: submitted.paymentMethod,
         deliveryAddress: submitted.type === 'DELIVERY' ? submitted.deliveryAddress : null,

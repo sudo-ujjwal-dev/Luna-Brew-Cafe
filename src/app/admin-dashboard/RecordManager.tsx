@@ -100,6 +100,7 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [updatingId, setUpdatingId] = useState('');
+  const [deletingId, setDeletingId] = useState('');
   const current = config[kind];
 
   const loadRecords = useCallback(async () => {
@@ -147,6 +148,26 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
     }
   }
 
+  async function deleteContactMessage(row: RecordRow) {
+    if (kind !== 'contact' || !window.confirm(`Permanently delete "${row.title}"?`)) return;
+    setDeletingId(row.id);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch(`${current.endpoint}/${row.id}`, { method: 'DELETE' });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(result.error || 'Unable to delete this message.');
+      setNotice('Contact message deleted.');
+      await loadRecords();
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error ? requestError.message : 'Unable to delete this message.'
+      );
+    } finally {
+      setDeletingId('');
+    }
+  }
+
   return (
     <div className="space-y-4">
       {(error || notice) && (
@@ -188,7 +209,7 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
                   {row.created ? new Date(row.created).toLocaleString('en-NP') : ''}
                 </time>
               </div>
-              <div>
+              <div className="flex flex-col gap-3">
                 <label
                   htmlFor={`record-status-${row.id}`}
                   className="mb-1.5 block text-xs font-600 text-muted-foreground"
@@ -208,6 +229,16 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
                     </option>
                   ))}
                 </select>
+                {kind === 'contact' && (
+                  <button
+                    type="button"
+                    disabled={deletingId === row.id}
+                    onClick={() => void deleteContactMessage(row)}
+                    className="rounded-xl border border-danger/30 px-3 py-2 text-sm font-600 text-danger hover:bg-danger-bg disabled:opacity-60"
+                  >
+                    {deletingId === row.id ? 'Deleting…' : 'Delete message'}
+                  </button>
+                )}
               </div>
             </article>
           ))}

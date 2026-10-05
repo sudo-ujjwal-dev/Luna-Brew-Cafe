@@ -33,3 +33,20 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Unable to update this message.' }, { status: 503 });
   }
 }
+
+export async function DELETE(request: Request, context: RouteContext) {
+  const authorizationError = await adminAuthorizationError(request, true);
+  if (authorizationError) return authorizationError;
+
+  const { id } = await context.params;
+  try {
+    await prisma.contactMessage.delete({ where: { id } });
+    return NextResponse.json({ deleted: true });
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'P2025') {
+      return NextResponse.json({ error: 'Contact message not found.' }, { status: 404 });
+    }
+    console.error('Admin contact message deletion failed:', error);
+    return NextResponse.json({ error: 'Unable to delete this message.' }, { status: 503 });
+  }
+}

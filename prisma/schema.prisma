@@ -9,6 +9,7 @@ datasource db {
 
 enum UserRole {
   ADMIN
+  CUSTOMER
 }
 
 enum ReservationStatus {
@@ -48,12 +49,17 @@ enum ContactStatus {
 }
 
 model User {
-  id           String   @id @default(cuid()) @db.VarChar(30)
-  email        String   @unique @db.VarChar(254)
-  passwordHash String   @db.VarChar(255)
-  role         UserRole @default(ADMIN)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id           String           @id @default(cuid()) @db.VarChar(30)
+  email        String           @unique @db.VarChar(254)
+  passwordHash String           @db.VarChar(255)
+  role         UserRole         @default(CUSTOMER)
+  name         String?          @db.VarChar(120)
+  phone        String?          @db.VarChar(30)
+  orders       Order[]
+  reservations Reservation[]
+  messages     ContactMessage[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 
   @@index([role])
 }
@@ -107,11 +113,14 @@ model Reservation {
   guestCount     Int
   specialRequest String?           @db.Text
   status         ReservationStatus @default(PENDING)
+  userId         String?           @db.VarChar(30)
+  user           User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
 
   @@index([date, time])
   @@index([status, date])
+  @@index([userId, date])
   @@index([createdAt])
 }
 
@@ -129,6 +138,8 @@ model Order {
   deliveryAddress String?     @db.Text
   notes           String?     @db.Text
   paymentMethod   String      @default("PAY_AT_CAFE") @db.VarChar(30)
+  userId          String?     @db.VarChar(30)
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   items           OrderItem[]
   reviews         Review[]
   createdAt       DateTime    @default(now())
@@ -137,6 +148,7 @@ model Order {
   @@index([status, createdAt])
   @@index([type, createdAt])
   @@index([phone, createdAt])
+  @@index([userId, createdAt])
 }
 
 model OrderItem {
@@ -178,10 +190,13 @@ model ContactMessage {
   subject   String        @db.VarChar(160)
   message   String        @db.Text
   status    ContactStatus @default(UNREAD)
+  userId    String?       @db.VarChar(30)
+  user      User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
   @@index([status, createdAt])
+  @@index([userId, createdAt])
 }
 
 model GalleryImage {
