@@ -95,8 +95,7 @@ export default function BookingSection() {
             </p>
             <h2 className="text-display font-700 text-white mb-4">Reserve Your Table</h2>
             <p className="text-white/60 leading-relaxed mb-8">
-              Request a table at our fictional Lakeside café. Requests are saved as pending until
-              the café administrator confirms them.
+              Request a table in Lakeside. Your reservation is pending until the café team confirms it.
             </p>
 
             <div className="space-y-4">

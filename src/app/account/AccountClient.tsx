@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
 interface AccountData {
   customer: { id: string; name: string; email: string } | null;
@@ -13,6 +13,10 @@ interface AccountData {
     status: string;
     total: number;
     createdAt: string;
+    deliveryAddress: string | null;
+    deliveryConfirmedAt: string | null;
+    deliveryIssueReportedAt: string | null;
+    reviews: Array<{ id: string; status: string }>;
     items: Array<{ itemName: string; quantity: number }>;
   }>;
   reservations: Array<{
@@ -24,51 +28,111 @@ interface AccountData {
   }>;
 }
 
-export default function AccountClient() {
+const orderStatusLabels: Record<string, string> = {
+  PENDING: 'Order received',
+  CONFIRMED: 'Confirmed',
+  PREPARING: 'Being prepared',
+  READY: 'Ready',
+  OUT_FOR_DELIVERY: 'Out for delivery',
+  DELIVERY_ISSUE: 'Delivery issue',
+  COMPLETED: 'Completed',
+  CANCELLED: 'Cancelled',
+};
+
+const progressStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'];
+
+function SkeletonBlock({ className = '' }: { className?: string }) {
+  return <div aria-hidden="true" className={`animate-pulse rounded-lg bg-muted ${className}`} />;
+}
+
+function AccountSkeleton() {
+  return (
+    <div role="status" aria-label="Loading account details" className="space-y-8">
+      <span className="sr-only">Loading account details</span>
+      <section className="rounded-2xl border border-border bg-card p-5 sm:p-7">
+        <SkeletonBlock className="mb-4 h-3 w-24" />
+        <SkeletonBlock className="h-6 w-48" />
+        <SkeletonBlock className="mt-3 h-4 w-56 max-w-full" />
+      </section>
+      {['Orders', 'Reservations'].map((section) => (
+        <section key={section}>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-700 text-foreground">{section}</h2>
+            {section === 'Orders' && <SkeletonBlock className="h-4 w-24" />}
+          </div>
+          {[0, 1].map((item) => (
+            <article
+              key={item}
+              className="mb-3 rounded-2xl border border-border bg-card p-5"
+              aria-hidden="true"
+            >
+              <div className="flex justify-between gap-4">
+                <div className="flex-1">
+                  <SkeletonBlock className="h-5 w-40 max-w-full" />
+                  <SkeletonBlock className="mt-3 h-3 w-32" />
+                </div>
+                <SkeletonBlock className="h-5 w-20" />
+              </div>
+              <SkeletonBlock className="mt-5 h-4 w-3/4" />
+            </article>
+          ))}
+        </section>
+      ))}
+    </div>
+  );
+}
+
+function statusLabel(status: string) {
+  return orderStatusLabels[status] ?? status.toLowerCase().replaceAll('_', ' ');
+}
+
+function statusStyle(status: string) {
+  if (status === 'COMPLETED' || status === 'CONFIRMED') {
+    return 'bg-success-bg text-success';
+  }
+  if (status === 'DELIVERY_ISSUE' || status === 'CANCELLED' || status === 'REJECTED') {
+    return 'bg-danger-bg text-danger';
+  }
+  return 'bg-secondary text-foreground';
+}
+
+export default function AccountClient({ welcome = false }: { welcome?: boolean }) {
   const router = useRouter();
   const [data, setData] = useState<AccountData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
+  const [confirmationOrderId, setConfirmationOrderId] = useState('');
+  const [reviewOrderId, setReviewOrderId] = useState('');
+  const [notice, setNotice] = useState('');
 
-  useEffect(() => {
-    const controller = new AbortController();
-    async function loadAccount() {
-      try {
-        const sessionResponse = await fetch('/api/account/session', { signal: controller.signal });
-        const session = (await sessionResponse.json()) as {
-          customer?: AccountData['customer'];
-          error?: string;
-        };
-        if (!sessionResponse.ok) throw new Error(session.error || 'Unable to load your account.');
-        if (!session.customer) {
+  const loadAccount = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await fetch('/api/account/history');
+      const result = (await response.json()) as AccountData & { error?: string };
+      if (!response.ok) {
+        if (response.status === 401) {
           router.replace('/account/login');
           return;
         }
-        const historyResponse = await fetch('/api/account/history', { signal: controller.signal });
-        const history = (await historyResponse.json()) as Omit<AccountData, 'customer'> & {
-          error?: string;
-        };
-        if (!historyResponse.ok)
-          throw new Error(history.error || 'Unable to load account history.');
-        setData({
-          customer: session.customer,
-          orders: history.orders,
-          reservations: history.reservations,
-        });
-      } catch (requestError) {
-        if (!controller.signal.aborted) {
-          setError(
-            requestError instanceof Error ? requestError.message : 'Unable to load your account.'
-          );
-        }
-      } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        throw new Error(result.error || 'Unable to load your account.');
       }
+      if (!result.customer) throw new Error('Your account details are unavailable.');
+      setData(result);
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error ? requestError.message : 'Unable to load your account.'
+      );
+    } finally {
+      setLoading(false);
     }
-    void loadAccount();
-    return () => controller.abort();
   }, [router]);
+
+  useEffect(() => {
+    void loadAccount();
+  }, [loadAccount]);
 
   async function logout() {
     setLoggingOut(true);
@@ -88,32 +152,129 @@ export default function AccountClient() {
     }
   }
 
-  if (loading) {
-    return (
-      <p role="status" className="py-16 text-center text-sm text-muted-foreground">
-        Loading your account…
-      </p>
-    );
+  async function confirmDelivery(orderId: string, received: boolean) {
+    setConfirmationOrderId(orderId);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch(`/api/account/orders/${orderId}/delivery-confirmation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ received }),
+      });
+      const result = (await response.json()) as { status?: string; error?: string };
+      if (!response.ok || !result.status) {
+        throw new Error(result.error || 'Unable to save your delivery response.');
+      }
+      setData((current) =>
+        current
+          ? {
+              ...current,
+              orders: current.orders.map((order) =>
+                order.id === orderId
+                  ? {
+                      ...order,
+                      status: result.status!,
+                      ...(received
+                        ? { deliveryConfirmedAt: new Date().toISOString() }
+                        : { deliveryIssueReportedAt: new Date().toISOString() }),
+                    }
+                  : order
+              ),
+            }
+          : current
+      );
+      setNotice(
+        received
+          ? 'Thanks for confirming your delivery. You can now leave a review.'
+          : 'Thanks for letting us know. The café team will review your delivery issue.'
+      );
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Unable to save your delivery response.'
+      );
+    } finally {
+      setConfirmationOrderId('');
+    }
   }
+
+  async function submitReview(orderId: string, event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setReviewOrderId(orderId);
+    setError('');
+    setNotice('');
+    const form = new FormData(event.currentTarget);
+    try {
+      const response = await fetch(`/api/account/orders/${orderId}/review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rating: form.get('rating'),
+          comment: form.get('comment'),
+          customerName: data?.customer?.name,
+        }),
+      });
+      const result = (await response.json()) as {
+        review?: { id: string; status: string };
+        error?: string;
+      };
+      if (!response.ok || !result.review) {
+        throw new Error(result.error || 'Unable to submit your review.');
+      }
+      setData((current) =>
+        current
+          ? {
+              ...current,
+              orders: current.orders.map((order) =>
+                order.id === orderId ? { ...order, reviews: [result.review!] } : order
+              ),
+            }
+          : current
+      );
+      setNotice('Thank you. Your review is saved and will appear after moderation.');
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'Unable to submit review.');
+    } finally {
+      setReviewOrderId('');
+    }
+  }
+
+  if (loading) return <AccountSkeleton />;
+
   if (error && !data) {
     return (
-      <p role="alert" className="rounded-xl bg-danger-bg p-4 text-sm text-danger">
-        {error}
-      </p>
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <p role="alert" className="text-sm text-danger">{error}</p>
+        <button
+          type="button"
+          onClick={() => void loadAccount()}
+          className="mt-4 rounded-xl bg-primary px-4 py-2.5 text-sm font-600 text-primary-foreground"
+        >
+          Try again
+        </button>
+        <Link href="/account/login" className="ml-4 text-sm font-600 text-primary hover:underline">
+          Sign in
+        </Link>
+      </div>
     );
   }
   if (!data?.customer) return null;
 
   return (
     <div className="space-y-8">
-      {error && (
-        <p role="alert" className="rounded-xl bg-danger-bg p-4 text-sm text-danger">
-          {error}
+      {(error || notice || welcome) && (
+        <p
+          role={error ? 'alert' : 'status'}
+          className={`rounded-xl p-4 text-sm ${error ? 'bg-danger-bg text-danger' : 'bg-success-bg text-success'}`}
+        >
+          {error || notice || 'Your account is ready. Welcome to Luna Brew Café.'}
         </p>
       )}
       <section className="flex flex-col justify-between gap-4 rounded-2xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:p-7">
         <div>
-          <p className="section-label mb-2">Your account</p>
+          <p className="section-label mb-2">Account information</p>
           <h2 className="text-xl font-700 text-foreground">{data.customer.name}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{data.customer.email}</p>
         </div>
@@ -121,7 +282,8 @@ export default function AccountClient() {
           type="button"
           onClick={() => void logout()}
           disabled={loggingOut}
-          className="rounded-xl border border-border px-4 py-2.5 text-sm font-600 text-foreground hover:bg-secondary disabled:opacity-60"
+          aria-busy={loggingOut}
+          className="rounded-xl border border-border px-4 py-2.5 text-sm font-600 text-foreground hover:bg-secondary disabled:cursor-wait disabled:opacity-60"
         >
           {loggingOut ? 'Signing out…' : 'Log out'}
         </button>
@@ -129,46 +291,150 @@ export default function AccountClient() {
 
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-700 text-foreground">Previous orders</h2>
+          <h2 className="text-xl font-700 text-foreground">Recent orders</h2>
           <Link href="/menu" className="text-sm font-600 text-primary hover:underline">
             Browse menu
           </Link>
         </div>
         {data.orders.length === 0 ? (
           <p className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
-            Orders placed while signed in will appear here.
+            Your orders will appear here once you place your first order.
           </p>
         ) : (
           <div className="space-y-3">
-            {data.orders.map((order) => (
-              <article key={order.id} className="rounded-2xl border border-border bg-card p-5">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-700 text-foreground">Order {order.orderNumber}</h3>
-                    <time
-                      className="mt-1 block text-xs text-muted-foreground"
-                      dateTime={order.createdAt}
+            {data.orders.map((order) => {
+              const showReview = order.status === 'COMPLETED';
+              const submittedReview = order.reviews[0];
+              return (
+                <article key={order.id} className="rounded-2xl border border-border bg-card p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-700 text-foreground">Order {order.orderNumber}</h3>
+                      <time className="mt-1 block text-xs text-muted-foreground" dateTime={order.createdAt}>
+                        {new Date(order.createdAt).toLocaleString('en-NP', {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        })}
+                      </time>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-700 text-primary">Rs. {order.total.toLocaleString('en-NP')}</p>
+                      <span className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-600 ${statusStyle(order.status)}`}>
+                        {statusLabel(order.status)}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    {order.items.map((item) => `${item.itemName} × ${item.quantity}`).join(', ')}
+                  </p>
+                  <p className="mt-2 text-xs font-600 text-foreground">
+                    {order.type === 'DELIVERY' ? 'Delivery' : order.type === 'DINE_IN' ? 'Dine-in' : 'Takeaway'}
+                  </p>
+                  {order.type === 'DELIVERY' && order.deliveryAddress && (
+                    <p className="mt-1 text-xs text-muted-foreground">{order.deliveryAddress}</p>
+                  )}
+
+                  {order.status === 'DELIVERY_ISSUE' ? (
+                    <div className="mt-4 rounded-xl border border-danger/20 bg-danger-bg p-4">
+                      <p className="text-sm font-600 text-danger">The café team is reviewing your delivery issue.</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        We have recorded that you did not receive your order. You cannot confirm receipt unless the café resolves the issue.
+                      </p>
+                    </div>
+                  ) : order.type === 'DELIVERY' &&
+                    order.status === 'OUT_FOR_DELIVERY' &&
+                    !order.deliveryConfirmedAt ? (
+                    <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                      <h4 className="font-700 text-foreground">Did you receive your delivery?</h4>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Let the café know once your order has arrived.
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={confirmationOrderId === order.id}
+                          aria-busy={confirmationOrderId === order.id}
+                          onClick={() => void confirmDelivery(order.id, true)}
+                          className="rounded-xl bg-primary px-4 py-2.5 text-sm font-600 text-primary-foreground disabled:cursor-wait disabled:opacity-60"
+                        >
+                          {confirmationOrderId === order.id ? 'Saving…' : 'Yes, I received it'}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={confirmationOrderId === order.id}
+                          aria-busy={confirmationOrderId === order.id}
+                          onClick={() => void confirmDelivery(order.id, false)}
+                          className="rounded-xl border border-border px-4 py-2.5 text-sm font-600 text-foreground disabled:cursor-wait disabled:opacity-60"
+                        >
+                          No, I didn’t receive it
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {order.type === 'DELIVERY' &&
+                    order.status === 'OUT_FOR_DELIVERY' &&
+                    !order.deliveryConfirmedAt && (
+                      <ol aria-label="Delivery progress" className="mt-5 flex items-center">
+                        {['Order received', 'Preparing', 'On the way', 'Your confirmation'].map((step, index) => (
+                          <li
+                            key={step}
+                            className={`flex-1 border-t-2 pt-2 text-center text-[10px] sm:text-xs ${
+                              index < 2 ? 'border-primary text-primary' : 'border-border text-muted-foreground'
+                            }`}
+                          >
+                            {step}
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+
+                  {showReview && submittedReview ? (
+                    <p role="status" className="mt-4 rounded-xl bg-success-bg p-3 text-sm text-success">
+                      Review submitted{submittedReview.status === 'PENDING' ? ' — awaiting moderation.' : '.'}
+                    </p>
+                  ) : showReview ? (
+                    <form
+                      onSubmit={(event) => void submitReview(order.id, event)}
+                      className="mt-4 grid gap-3 rounded-xl border border-border bg-secondary/30 p-4 sm:grid-cols-[140px_1fr_auto]"
                     >
-                      {new Date(order.createdAt).toLocaleString('en-NP', {
-                        dateStyle: 'medium',
-                        timeStyle: 'short',
-                      })}
-                    </time>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-700 text-primary">
-                      Rs. {order.total.toLocaleString('en-NP')}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {order.status.replaceAll('_', ' ')} · {order.type.replaceAll('_', ' ')}
-                    </p>
-                  </div>
-                </div>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {order.items.map((item) => `${item.itemName} × ${item.quantity}`).join(', ')}
-                </p>
-              </article>
-            ))}
+                      <label className="text-sm font-600 text-foreground">
+                        Rate your order
+                        <select
+                          name="rating"
+                          required
+                          defaultValue="5"
+                          className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
+                        >
+                          {[5, 4, 3, 2, 1].map((rating) => (
+                            <option key={rating} value={rating}>{rating} {rating === 1 ? 'star' : 'stars'}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="text-sm font-600 text-foreground">
+                        Your review
+                        <textarea
+                          name="comment"
+                          required
+                          minLength={10}
+                          maxLength={3000}
+                          rows={2}
+                          className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
+                        />
+                      </label>
+                      <button
+                        type="submit"
+                        disabled={reviewOrderId === order.id}
+                        aria-busy={reviewOrderId === order.id}
+                        className="self-end rounded-xl bg-primary px-4 py-2.5 text-sm font-600 text-primary-foreground disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {reviewOrderId === order.id ? 'Submitting…' : 'Leave a review'}
+                      </button>
+                    </form>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
         )}
       </section>
@@ -177,7 +443,7 @@ export default function AccountClient() {
         <h2 className="mb-4 text-xl font-700 text-foreground">Reservations</h2>
         {data.reservations.length === 0 ? (
           <p className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
-            Reservations made while signed in will appear here.
+            Your reservations will appear here.
           </p>
         ) : (
           <div className="space-y-3">
@@ -193,11 +459,11 @@ export default function AccountClient() {
                     })}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {reservation.time} · {reservation.guestCount} guests
+                    {reservation.time} · {reservation.guestCount} {reservation.guestCount === 1 ? 'guest' : 'guests'}
                   </p>
                 </div>
-                <span className="rounded-full bg-secondary px-3 py-1 text-xs font-600 text-foreground">
-                  {reservation.status}
+                <span className={`rounded-full px-3 py-1 text-xs font-600 ${statusStyle(reservation.status)}`}>
+                  {reservation.status.toLowerCase().replaceAll('_', ' ')}
                 </span>
               </article>
             ))}

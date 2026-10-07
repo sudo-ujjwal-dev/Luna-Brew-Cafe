@@ -29,15 +29,11 @@ export default function PublicFooter() {
               <AppLogo size={36} />
               <div>
                 <p className="font-bold text-white text-base">Luna Brew Café</p>
-                <p className="text-white/50 text-xs">Fictional café concept</p>
+                <p className="text-white/50 text-xs">Lakeside, Pokhara</p>
               </div>
             </div>
             <p className="text-sm text-white/60 leading-relaxed mb-5">
-              A fictional Lakeside, Pokhara café concept created as a portfolio project. Menu,
-              hours, and contact details are illustrative.
-            </p>
-            <p className="text-xs text-white/50">
-              No social profiles are configured for this demo.
+              Coffee, café favourites, and a relaxed place to pause in Lakeside.
             </p>
           </div>
 
@@ -85,8 +81,8 @@ export default function PublicFooter() {
             <h4 className="text-white font-600 text-xs mb-4 tracking-wide uppercase">Find Us</h4>
             <ul className="space-y-3">
               {[
-                { Icon: MapPin, text: 'Lakeside, Pokhara, Nepal · approximate demo area' },
-                { Icon: Mail, text: 'hello@lunabrew.example' },
+                { Icon: MapPin, text: 'Lakeside, Pokhara, Nepal' },
+                { Icon: Mail, text: 'Send us a message through the contact form' },
               ]?.map(({ Icon, text }) => (
                 <li
                   key={`footer-contact-${text}`}
@@ -102,9 +98,7 @@ export default function PublicFooter() {
 
         <div className="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/40">
           <p>© 2026 Luna Brew Café. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <span>Demo content — not a real business listing.</span>
-          </div>
+          <span>Lakeside, Pokhara, Nepal</span>
         </div>
       </div>
     </footer>

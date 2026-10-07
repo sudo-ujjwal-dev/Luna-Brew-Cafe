@@ -5,7 +5,7 @@ import Link from 'next/link';
 import AppLogo from '@/components/ui/AppLogo';
 import { Menu, X, ShoppingBag, UserRound } from 'lucide-react';
 import { cartItemCount, readCart, subscribeToCart } from '@/lib/cart';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -20,18 +20,23 @@ interface PublicNavProps {
 }
 
 export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [customerName, setCustomerName] = useState<string | null>(null);
   const [accountError, setAccountError] = useState('');
+  const [loggingOut, setLoggingOut] = useState(false);
+  const pathname = usePathname();
   const router = useRouter();
+  const activePath = currentPath === '/' && pathname ? pathname : currentPath;
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40);
+    const isHomePage = (pathname ?? currentPath) === '/';
+    const handleScroll = () => setScrolled(!isHomePage || window.scrollY > 40);
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [currentPath, pathname]);
 
   useEffect(() => {
     const updateCartCount = () => setCartCount(cartItemCount(readCart()));
@@ -58,6 +63,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
 
   async function logout() {
     setAccountError('');
+    setLoggingOut(true);
     try {
       const response = await fetch('/api/account/logout', { method: 'POST' });
       if (!response.ok) throw new Error('Unable to sign out.');
@@ -67,6 +73,8 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
     } catch (error) {
       console.error('Customer sign-out failed:', error);
       setAccountError('Unable to sign out right now. Please try again.');
+    } finally {
+      setLoggingOut(false);
     }
   }
 
@@ -76,7 +84,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
             ? 'bg-card/95 backdrop-blur-md shadow-nav border-b border-border'
-            : 'bg-transparent'
+            : 'bg-foreground/55 backdrop-blur-sm shadow-nav'
         }`}
       >
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -109,7 +117,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                   key={`nav-${link.href}`}
                   href={link.href}
                   className={`px-4 py-2 text-sm font-500 rounded-lg transition-all duration-150 nav-link-underline ${
-                    currentPath === link.href
+                    activePath === link.href
                       ? scrolled
                         ? 'text-primary font-600'
                         : 'text-accent font-600'
@@ -141,13 +149,15 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                   <button
                     type="button"
                     onClick={() => void logout()}
-                    className={`rounded-lg px-3 py-2 text-sm font-600 transition-colors ${
+                    disabled={loggingOut}
+                    aria-busy={loggingOut}
+                    className={`rounded-lg px-3 py-2 text-sm font-600 transition-colors disabled:cursor-wait disabled:opacity-60 ${
                       scrolled
                         ? 'text-foreground hover:bg-secondary'
                         : 'text-white hover:bg-white/10'
                     }`}
                   >
-                    Log out
+                    {loggingOut ? 'Signing out…' : 'Log out'}
                   </button>
                 </>
               ) : (
@@ -211,7 +221,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-500 transition-colors ${
-                  currentPath === link.href
+                  activePath === link.href
                     ? 'bg-secondary text-primary font-600'
                     : 'text-foreground hover:bg-secondary/60'
                 }`}
@@ -233,9 +243,11 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                   <button
                     type="button"
                     onClick={() => void logout()}
-                    className="w-full rounded-xl px-5 py-3 text-sm font-600 text-foreground hover:bg-secondary"
+                    disabled={loggingOut}
+                    aria-busy={loggingOut}
+                    className="w-full rounded-xl px-5 py-3 text-sm font-600 text-foreground hover:bg-secondary disabled:cursor-wait disabled:opacity-60"
                   >
-                    Log out
+                    {loggingOut ? 'Signing out…' : 'Log out'}
                   </button>
                 </>
               ) : (

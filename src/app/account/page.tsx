@@ -9,7 +9,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function AccountPage() {
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ welcome?: string }>;
+}) {
+  const params = await searchParams;
   return (
     <>
       <PublicNav />
@@ -18,11 +23,11 @@ export default function AccountPage() {
           <Link href="/" className="text-sm font-600 text-primary hover:underline">
             ← Home
           </Link>
-          <h1 className="mt-4 text-display font-800 text-foreground">My account</h1>
+          <h1 className="mt-4 text-display font-800 text-foreground">My Account</h1>
           <p className="mb-8 mt-2 text-sm text-muted-foreground">
-            Your account details and café history.
+            Manage your profile, orders and reservations.
           </p>
-          <AccountClient />
+          <AccountClient welcome={params.welcome === '1'} />
         </div>
       </main>
       <PublicFooter />

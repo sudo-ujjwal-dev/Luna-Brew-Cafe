@@ -44,7 +44,7 @@ export default async function OrderConfirmationPage({ searchParams }: OrderConfi
           {order ? (
             <>
               <p className="mt-3 text-sm text-muted-foreground">
-                Your order has been saved. This demo does not send email or SMS updates.
+                Your order is saved. Sign in to your account to follow its progress and confirm delivery.
               </p>
               <dl className="mt-6 space-y-3 rounded-xl bg-secondary/50 p-4 text-left text-sm">
                 <div className="flex justify-between gap-3">
@@ -53,7 +53,15 @@ export default async function OrderConfirmationPage({ searchParams }: OrderConfi
                 </div>
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground">Status</dt>
-                  <dd className="font-600 text-foreground">{order.status.replaceAll('_', ' ')}</dd>
+                  <dd className="font-600 text-foreground">
+                    {order.status === 'PENDING'
+                      ? 'Order received'
+                      : order.status === 'PREPARING'
+                        ? 'Being prepared'
+                        : order.status === 'OUT_FOR_DELIVERY'
+                          ? 'Out for delivery'
+                          : order.status.toLowerCase().replaceAll('_', ' ')}
+                  </dd>
                 </div>
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground">Total</dt>

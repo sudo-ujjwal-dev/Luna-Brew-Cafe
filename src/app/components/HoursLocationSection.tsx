@@ -30,7 +30,7 @@ export default function HoursLocationSection() {
             referrerPolicy="no-referrer"
           />
           <p className="absolute bottom-3 left-3 rounded-lg bg-card/95 px-3 py-2 text-xs text-foreground shadow-card">
-            Approximate Lakeside demo area — not a business address.
+            Lakeside, Pokhara, Nepal
           </p>
         </div>
 
@@ -57,9 +57,6 @@ export default function HoursLocationSection() {
                 </li>
               ))}
             </ul>
-            <p className="mt-4 rounded-xl bg-secondary px-3 py-2 text-xs text-muted-foreground">
-              Example hours for this fictional café concept.
-            </p>
           </div>
 
           {/* Contact info */}
@@ -69,13 +66,13 @@ export default function HoursLocationSection() {
               {[
                 {
                   Icon: MapPin,
-                  text: 'Lakeside, Pokhara, Nepal (approximate demo area)',
+                  text: 'Lakeside, Pokhara, Nepal',
                   href: 'https://www.openstreetmap.org/search?query=Lakeside%2C%20Pokhara%2C%20Nepal',
                 },
                 {
                   Icon: Mail,
-                  text: 'hello@lunabrew.example',
-                  href: 'mailto:hello@lunabrew.example',
+                  text: 'Contact the café team',
+                  href: '#contact-message',
                 },
               ]?.map(({ Icon, text, href }) => (
                 <li key={`contact-${text}`}>

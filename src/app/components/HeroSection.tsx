@@ -25,7 +25,7 @@ export default function HeroSection() {
         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
           <MapPin size={12} className="text-accent" />
           <span className="text-white/90 text-xs font-500">
-            Lakeside, Pokhara, Nepal · Demo café
+            Lakeside, Pokhara, Nepal
           </span>
         </div>
 
@@ -34,8 +34,7 @@ export default function HeroSection() {
         </h1>
 
         <p className="text-white/75 text-lg md:text-xl font-400 max-w-xl mx-auto mb-8 leading-relaxed">
-          A café concept inspired by Pokhara&apos;s lakeside mornings, with coffee, familiar comfort
-          food, and a relaxed place to pause.
+          Coffee, comforting café favourites, and a relaxed place to pause by the lakeside.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -53,10 +52,6 @@ export default function HeroSection() {
             Reserve a Table
           </Link>
         </div>
-
-        <p className="mt-10 text-sm text-white/65">
-          A fictional portfolio project — not a real café.
-        </p>
       </div>
 
       {/* Scroll indicator */}

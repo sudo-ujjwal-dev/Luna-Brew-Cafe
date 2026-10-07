@@ -24,7 +24,6 @@ export default function MenuItemCard({ item }: MenuItemCardProps) {
   const handleAddToCart = () => {
     addItemToCart(item.id);
     setAdded(true);
-    window.setTimeout(() => setAdded(false), 1800);
   };
 
   return (

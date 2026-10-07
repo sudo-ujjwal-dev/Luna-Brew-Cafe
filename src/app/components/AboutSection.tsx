@@ -7,19 +7,19 @@ const values = [
     id: 'val-craft',
     Icon: Coffee,
     title: 'Craft First',
-    desc: 'Thoughtful coffee and a short menu made for slow mornings and easy meetups.',
+    desc: 'Coffee and café favourites for slow mornings and easy meetups.',
   },
   {
     id: 'val-community',
     Icon: Heart,
     title: 'Community',
-    desc: 'A fictional Lakeside café concept designed around the welcoming spirit of Pokhara.',
+    desc: 'A welcoming place to meet, take a break, and enjoy the Lakeside neighbourhood.',
   },
   {
     id: 'val-sustainable',
     Icon: Leaf,
     title: 'Sustainable',
-    desc: 'A place to showcase seasonal ingredients and practical, low-waste café habits.',
+    desc: 'A thoughtful approach to ingredients and everyday café hospitality.',
   },
 ];
 
@@ -78,17 +78,15 @@ export default function AboutSection() {
           <div>
             <p className="section-label mb-3">Our Story</p>
             <h2 className="text-display font-700 text-foreground mb-5">
-              A café concept shaped by Pokhara
+              A little pause in Lakeside
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Luna Brew Café is a fictional portfolio concept set in Lakeside, Pokhara. The idea is
-              simple: pair carefully prepared coffee with comforting café food in a relaxed place to
-              meet, take a break, or ease into the day.
+              Luna Brew Café brings together carefully prepared coffee and comforting café food in
+              Lakeside, Pokhara. Settle in to meet, take a break, or ease into the day.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-8">
-              The sample menu uses familiar café favourites alongside flavours that suit a visit to
-              Nepal. All business details, menu items, and imagery on this demo are illustrative and
-              should be replaced with verified information before launch.
+              From familiar café favourites to flavours inspired by Nepal, there is something to
+              enjoy throughout the day.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

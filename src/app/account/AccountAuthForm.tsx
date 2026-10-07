@@ -31,7 +31,7 @@ export default function AccountAuthForm({ mode }: { mode: 'login' | 'register' }
       });
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error || 'Account request failed.');
-      router.replace('/account');
+      router.replace(registering ? '/account?welcome=1' : '/account');
       router.refresh();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Account request failed.');

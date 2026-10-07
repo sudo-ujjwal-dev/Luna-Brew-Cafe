@@ -50,12 +50,13 @@ export default function ContactMessageForm() {
   return (
     <form
       onSubmit={submitMessage}
+      id="contact-message"
       className="space-y-4 rounded-2xl border border-border bg-card p-6"
     >
       <div>
         <h3 className="font-700 text-foreground">Send a message</h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Message the café team at lumlelyujjwal@gmail.com.
+          Send a message to the café team.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

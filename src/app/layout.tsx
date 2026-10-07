@@ -27,12 +27,11 @@ export const metadata: Metadata = {
     ? { metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL) }
     : {}),
   title: 'Luna Brew Café | Lakeside, Pokhara',
-  description:
-    'A fictional café website concept for Lakeside, Pokhara, Nepal. Explore sample café food, coffee, and business features.',
+  description: 'Coffee, café favourites, and a relaxed place to pause in Lakeside, Pokhara, Nepal.',
   keywords: ['cafe', 'coffee shop', 'restaurant', 'Luna Brew', 'Lakeside', 'Pokhara', 'Nepal'],
   openGraph: {
     title: 'Luna Brew Café',
-    description: 'A fictional café concept for Lakeside, Pokhara, Nepal.',
+    description: 'Coffee, café favourites, and a relaxed place to pause in Lakeside, Pokhara, Nepal.',
     type: 'website',
     locale: 'en_NP',
   },

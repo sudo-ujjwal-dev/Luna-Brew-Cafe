@@ -5,10 +5,9 @@ import PublicFooter from '@/components/PublicFooter';
 import MenuClient from './components/MenuClient';
 
 export const metadata: Metadata = {
-  title: 'Sample Menu — Luna Brew Café, Pokhara',
+  title: 'Menu — Luna Brew Café, Pokhara',
   alternates: { canonical: '/menu' },
-  description:
-    'Browse sample coffee, tea, breakfast, café meals, and dessert items with example prices in Nepali rupees.',
+  description: 'Browse coffee, tea, breakfast, café meals, and desserts at Luna Brew Café.',
 };
 
 export default function MenuPage() {
@@ -29,12 +28,11 @@ export default function MenuPage() {
           </div>
           <div className="max-w-screen-xl mx-auto relative z-10 text-center">
             <p className="text-accent text-xs font-600 uppercase tracking-widest mb-3">
-              Sample menu · prices in NPR
+              Menu · prices in NPR
             </p>
             <h1 className="text-display font-800 text-white mb-3">Our Menu</h1>
             <p className="text-white/60 max-w-md mx-auto text-sm leading-relaxed">
-              Example coffee, tea, breakfast, café meals, and desserts for this fictional Pokhara
-              café.
+              Coffee, tea, breakfast, café meals, and desserts for every part of the day.
             </p>
           </div>
         </div>

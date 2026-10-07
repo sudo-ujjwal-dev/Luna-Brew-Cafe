@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
         <p className="section-label mb-2">Luna Brew Café</p>
         <h1 className="text-2xl font-700 text-foreground">Admin sign in</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          This private area is for authorized demo administrators.
+          This private area is for authorized café administrators.
         </p>
         <AdminLoginForm />
       </div>

@@ -218,7 +218,7 @@ async function main() {
         vegan,
         available,
         image,
-        imageAlt: `${name}, demo menu photo`,
+        imageAlt: `${name}, served at Luna Brew Café`,
       },
       create: {
         slug,
@@ -231,19 +231,22 @@ async function main() {
         vegan,
         available,
         image,
-        imageAlt: `${name}, demo menu photo`,
+        imageAlt: `${name}, served at Luna Brew Café`,
       },
     });
   }
 
   await prisma.galleryImage.upsert({
     where: { id: 'demo-lakeside-cafe' },
-    update: {},
+    update: {
+      title: 'Lakeside café atmosphere',
+      altText: 'Warm café interior with natural light',
+    },
     create: {
       id: 'demo-lakeside-cafe',
-      title: 'Lakeside café atmosphere concept',
+      title: 'Lakeside café atmosphere',
       imageUrl: 'https://images.unsplash.com/photo-1635076870262-9893a73ecb45',
-      altText: 'Illustrative café interior used for the fictional demo',
+      altText: 'Warm café interior with natural light',
       category: 'Interior',
       visible: true,
       sortOrder: 1,
@@ -256,7 +259,7 @@ async function main() {
     create: {
       id: 'default',
       businessName: 'Luna Brew Café',
-      locationLabel: 'Lakeside, Pokhara, Nepal (demo area)',
+      locationLabel: 'Lakeside, Pokhara, Nepal',
       openingHours: {
         weekdays: '7:30 AM – 8:00 PM',
         saturday: '8:00 AM – 9:00 PM',
@@ -265,7 +268,7 @@ async function main() {
     },
   });
 
-  console.log('Demo café categories, menu, gallery, and settings are ready.');
+  console.log('Luna Brew Café menu, gallery, and settings are ready.');
 }
 
 main()
