@@ -121,6 +121,7 @@ export default function AccountAuthForm({ mode }: { mode: 'login' | 'register' }
       <button
         type="submit"
         disabled={submitting}
+        aria-busy={submitting}
         className="w-full rounded-xl bg-primary py-3 text-sm font-700 text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {submitting ? 'Please wait…' : registering ? 'Create Account' : 'Login'}

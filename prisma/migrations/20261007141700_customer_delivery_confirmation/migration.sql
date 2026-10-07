@@ -5,6 +5,7 @@ ALTER TABLE `Order`
   ADD COLUMN `deliveryIssueResolvedAt` DATETIME(3) NULL;
 
 ALTER TABLE `Review`
+  DROP INDEX `Review_orderId_idx`,
   ADD UNIQUE INDEX `Review_orderId_key` (`orderId`);
 
 ALTER TABLE `BusinessSettings`

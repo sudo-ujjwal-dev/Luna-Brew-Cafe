@@ -149,6 +149,7 @@ export default function ContactMessageForm() {
       <button
         type="submit"
         disabled={submitting}
+        aria-busy={submitting}
         className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
       >
         {submitting ? 'Sending…' : 'Send message'}

@@ -54,13 +54,16 @@ export default async function OrderConfirmationPage({ searchParams }: OrderConfi
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted-foreground">Status</dt>
                   <dd className="font-600 text-foreground">
-                    {order.status === 'PENDING'
-                      ? 'Order received'
-                      : order.status === 'PREPARING'
-                        ? 'Being prepared'
-                        : order.status === 'OUT_FOR_DELIVERY'
-                          ? 'Out for delivery'
-                          : order.status.toLowerCase().replaceAll('_', ' ')}
+                    {{
+                      PENDING: 'Order received',
+                      CONFIRMED: 'Confirmed',
+                      PREPARING: 'Being prepared',
+                      READY: 'Ready',
+                      OUT_FOR_DELIVERY: 'Out for delivery',
+                      DELIVERY_ISSUE: 'Delivery issue',
+                      COMPLETED: 'Completed',
+                      CANCELLED: 'Cancelled',
+                    }[order.status] ?? order.status.toLowerCase().replaceAll('_', ' ')}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-3">

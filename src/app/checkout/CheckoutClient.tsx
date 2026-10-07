@@ -91,9 +91,23 @@ export default function CheckoutClient() {
 
   if (loading) {
     return (
-      <p role="status" className="py-16 text-center text-muted-foreground">
-        Loading checkout…
-      </p>
+      <div role="status" aria-label="Loading checkout" className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
+        <span className="sr-only">Preparing checkout form</span>
+        <div aria-hidden="true" className="h-[560px] animate-pulse rounded-2xl border border-border bg-card p-6">
+          <div className="h-5 w-56 rounded bg-muted" />
+          {[0, 1, 2, 3].map((item) => (
+            <div key={item} className="mt-8">
+              <div className="h-4 w-28 rounded bg-muted" />
+              <div className="mt-2 h-11 w-full rounded-xl bg-muted" />
+            </div>
+          ))}
+        </div>
+        <div aria-hidden="true" className="h-64 animate-pulse rounded-2xl border border-border bg-card p-5">
+          <div className="h-5 w-32 rounded bg-muted" />
+          <div className="mt-6 h-4 w-full rounded bg-muted" />
+          <div className="mt-3 h-4 w-2/3 rounded bg-muted" />
+        </div>
+      </div>
     );
   }
   if (error) {
@@ -264,6 +278,7 @@ export default function CheckoutClient() {
         <button
           type="submit"
           disabled={submitting || (orderType === 'DELIVERY' && deliveryFee === null)}
+          aria-busy={submitting}
           className="w-full rounded-xl bg-primary py-3.5 text-sm font-700 text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? 'Placing order…' : 'Place order'}

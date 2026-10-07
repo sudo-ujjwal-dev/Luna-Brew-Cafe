@@ -20,6 +20,11 @@ export function useCartProducts() {
     const controller = new AbortController();
 
     async function loadMenu() {
+      if (readCart().length === 0) {
+        setMenuItems([]);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setError('');
       try {

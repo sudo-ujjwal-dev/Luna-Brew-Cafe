@@ -39,8 +39,6 @@ const orderStatusLabels: Record<string, string> = {
   CANCELLED: 'Cancelled',
 };
 
-const progressStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY'];
-
 function SkeletonBlock({ className = '' }: { className?: string }) {
   return <div aria-hidden="true" className={`animate-pulse rounded-lg bg-muted ${className}`} />;
 }
@@ -303,7 +301,9 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
         ) : (
           <div className="space-y-3">
             {data.orders.map((order) => {
-              const showReview = order.status === 'COMPLETED';
+              const showReview =
+                order.status === 'COMPLETED' &&
+                (order.type !== 'DELIVERY' || order.deliveryConfirmedAt !== null);
               const submittedReview = order.reviews[0];
               return (
                 <article key={order.id} className="rounded-2xl border border-border bg-card p-5">
@@ -387,6 +387,14 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                           </li>
                         ))}
                       </ol>
+                    )}
+
+                  {order.type === 'DELIVERY' &&
+                    order.status === 'COMPLETED' &&
+                    !order.deliveryConfirmedAt && (
+                      <p className="mt-4 rounded-xl bg-secondary p-3 text-sm text-muted-foreground">
+                        If this delivery status looks incorrect, please contact the café team.
+                      </p>
                     )}
 
                   {showReview && submittedReview ? (
