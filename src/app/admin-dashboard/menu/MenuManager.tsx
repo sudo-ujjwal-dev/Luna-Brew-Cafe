@@ -54,11 +54,14 @@ export default function MenuManager() {
   const [newCategory, setNewCategory] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [categorySaving, setCategorySaving] = useState(false);
+  const [updatingId, setUpdatingId] = useState('');
+  const [changingCategoryId, setChangingCategoryId] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  async function loadMenu() {
-    setLoading(true);
+  async function loadMenu(showSkeleton = true) {
+    if (showSkeleton) setLoading(true);
     setError('');
     try {
       const response = await fetch('/api/admin/menu');
@@ -68,7 +71,7 @@ export default function MenuManager() {
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Menu data is unavailable.');
     } finally {
-      setLoading(false);
+      if (showSkeleton) setLoading(false);
     }
   }
 
@@ -121,7 +124,7 @@ export default function MenuManager() {
       });
       setEditingId(null);
       setNotice(editingId ? 'Menu item updated.' : 'Menu item created.');
-      await loadMenu();
+      await loadMenu(false);
     } catch (requestError) {
       setError(
         requestError instanceof Error ? requestError.message : 'Unable to save this menu item.'
@@ -136,6 +139,7 @@ export default function MenuManager() {
       !window.confirm(`Mark "${item.name}" unavailable? It will remain in previous order records.`)
     )
       return;
+    setUpdatingId(item.id);
     setError('');
     setNotice('');
     try {
@@ -143,16 +147,19 @@ export default function MenuManager() {
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error || 'Unable to deactivate this item.');
       setNotice(`${item.name} marked unavailable.`);
-      await loadMenu();
+      await loadMenu(false);
     } catch (requestError) {
       setError(
         requestError instanceof Error ? requestError.message : 'Unable to deactivate this item.'
       );
+    } finally {
+      setUpdatingId('');
     }
   }
 
   async function submitCategory(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setCategorySaving(true);
     setError('');
     setNotice('');
     try {
@@ -168,16 +175,19 @@ export default function MenuManager() {
       setNewCategory('');
       setForm((current) => ({ ...current, categoryId: result.category!.id }));
       setNotice('Category created.');
-      await loadMenu();
+      await loadMenu(false);
     } catch (requestError) {
       setError(
         requestError instanceof Error ? requestError.message : 'Unable to create this category.'
       );
+    } finally {
+      setCategorySaving(false);
     }
   }
 
   async function toggleCategory(category: Category) {
     const nextActive = !category.active;
+    setChangingCategoryId(category.id);
     setError('');
     setNotice('');
     try {
@@ -189,11 +199,13 @@ export default function MenuManager() {
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error || 'Unable to update this category.');
       setNotice(nextActive ? 'Category reactivated.' : 'Category deactivated.');
-      await loadMenu();
+      await loadMenu(false);
     } catch (requestError) {
       setError(
         requestError instanceof Error ? requestError.message : 'Unable to update this category.'
       );
+    } finally {
+      setChangingCategoryId('');
     }
   }
 
@@ -356,6 +368,7 @@ export default function MenuManager() {
             <button
               type="submit"
               disabled={saving || activeCategories.length === 0}
+              aria-busy={saving}
               className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
             >
               {saving ? 'Saving…' : editingId ? 'Save changes' : 'Create menu item'}
@@ -399,9 +412,11 @@ export default function MenuManager() {
               />
               <button
                 type="submit"
-                className="rounded-xl bg-primary px-3 py-2 text-sm font-600 text-primary-foreground"
+                disabled={categorySaving}
+                aria-busy={categorySaving}
+                className="rounded-xl bg-primary px-3 py-2 text-sm font-600 text-primary-foreground disabled:cursor-wait disabled:opacity-60"
               >
-                Add
+                {categorySaving ? 'Adding…' : 'Add'}
               </button>
             </form>
           </div>
@@ -416,10 +431,16 @@ export default function MenuManager() {
                 </div>
                 <button
                   type="button"
+                  disabled={changingCategoryId === category.id}
+                  aria-busy={changingCategoryId === category.id}
                   onClick={() => void toggleCategory(category)}
-                  className="text-xs font-600 text-primary hover:underline"
+                  className="text-xs font-600 text-primary hover:underline disabled:cursor-wait disabled:opacity-60"
                 >
-                  {category.active ? 'Deactivate' : 'Reactivate'}
+                  {changingCategoryId === category.id
+                    ? 'Saving…'
+                    : category.active
+                      ? 'Deactivate'
+                      : 'Reactivate'}
                 </button>
               </li>
             ))}
@@ -432,9 +453,18 @@ export default function MenuManager() {
           <h2 className="text-lg font-700 text-foreground">Menu items</h2>
         </div>
         {loading ? (
-          <p role="status" className="p-8 text-center text-sm text-muted-foreground">
-            Loading menu items…
-          </p>
+          <div role="status" aria-label="Loading menu items" className="animate-pulse space-y-4 p-5">
+            <span className="sr-only">Loading menu items</span>
+            {[0, 1, 2, 3].map((item) => (
+              <div key={item} aria-hidden="true" className="grid grid-cols-5 gap-4">
+                <div className="h-5 rounded bg-muted" />
+                <div className="h-5 rounded bg-muted" />
+                <div className="h-5 rounded bg-muted" />
+                <div className="h-5 rounded bg-muted" />
+                <div className="h-5 rounded bg-muted" />
+              </div>
+            ))}
+          </div>
         ) : data.items.length === 0 ? (
           <p className="p-8 text-center text-sm text-muted-foreground">
             No menu items have been added.
@@ -470,18 +500,21 @@ export default function MenuManager() {
                       <div className="flex gap-3">
                         <button
                           type="button"
+                          disabled={updatingId === item.id}
                           onClick={() => editItem(item)}
-                          className="font-600 text-primary hover:underline"
+                          className="font-600 text-primary hover:underline disabled:opacity-60"
                         >
                           Edit
                         </button>
                         {item.available && (
                           <button
                             type="button"
+                            disabled={updatingId === item.id}
+                            aria-busy={updatingId === item.id}
                             onClick={() => void deactivateItem(item)}
-                            className="font-600 text-danger hover:underline"
+                            className="font-600 text-danger hover:underline disabled:cursor-wait disabled:opacity-60"
                           >
-                            Deactivate
+                            {updatingId === item.id ? 'Saving…' : 'Deactivate'}
                           </button>
                         )}
                       </div>

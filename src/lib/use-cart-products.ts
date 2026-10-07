@@ -9,6 +9,7 @@ export function useCartProducts() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const hasCartItems = lines.length > 0;
 
   useEffect(() => {
     const sync = () => setLines(readCart());
@@ -20,8 +21,9 @@ export function useCartProducts() {
     const controller = new AbortController();
 
     async function loadMenu() {
-      if (readCart().length === 0) {
+      if (!hasCartItems) {
         setMenuItems([]);
+        setError('');
         setLoading(false);
         return;
       }
@@ -49,7 +51,7 @@ export function useCartProducts() {
 
     void loadMenu();
     return () => controller.abort();
-  }, []);
+  }, [hasCartItems]);
 
   const products = useMemo(
     () =>
@@ -62,6 +64,5 @@ export function useCartProducts() {
   const unavailableIds = lines
     .filter((line) => !menuItems.some((item) => item.id === line.menuItemId))
     .map((line) => line.menuItemId);
-
   return { lines, products, unavailableIds, loading, error };
 }

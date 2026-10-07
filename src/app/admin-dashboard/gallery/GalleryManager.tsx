@@ -24,11 +24,13 @@ export default function GalleryManager() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [updatingId, setUpdatingId] = useState('');
+  const [deletingId, setDeletingId] = useState('');
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  async function loadImages() {
-    setLoading(true);
+  async function loadImages(showSkeleton = true) {
+    if (showSkeleton) setLoading(true);
     setError('');
     try {
       const response = await fetch('/api/admin/gallery');
@@ -41,7 +43,7 @@ export default function GalleryManager() {
         requestError instanceof Error ? requestError.message : 'Gallery data is unavailable.'
       );
     } finally {
-      setLoading(false);
+      if (showSkeleton) setLoading(false);
     }
   }
 
@@ -64,7 +66,7 @@ export default function GalleryManager() {
       if (!response.ok) throw new Error(result.error || 'Unable to add this image.');
       setForm({ title: '', imageUrl: '', altText: '', category: 'Interior', sortOrder: '0' });
       setNotice('Gallery image added.');
-      await loadImages();
+      await loadImages(false);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Unable to add this image.');
     } finally {
@@ -73,6 +75,7 @@ export default function GalleryManager() {
   }
 
   async function updateImage(image: GalleryImage, changes: Partial<GalleryImage>) {
+    setUpdatingId(image.id);
     setError('');
     setNotice('');
     try {
@@ -84,16 +87,19 @@ export default function GalleryManager() {
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error || 'Unable to update the image.');
       setNotice('Gallery image updated.');
-      await loadImages();
+      await loadImages(false);
     } catch (requestError) {
       setError(
         requestError instanceof Error ? requestError.message : 'Unable to update the image.'
       );
+    } finally {
+      setUpdatingId('');
     }
   }
 
   async function deleteImage(image: GalleryImage) {
     if (!window.confirm(`Delete "${image.title}" from the gallery?`)) return;
+    setDeletingId(image.id);
     setError('');
     setNotice('');
     try {
@@ -101,11 +107,13 @@ export default function GalleryManager() {
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error || 'Unable to delete the image.');
       setNotice('Gallery image deleted.');
-      await loadImages();
+      await loadImages(false);
     } catch (requestError) {
       setError(
         requestError instanceof Error ? requestError.message : 'Unable to delete the image.'
       );
+    } finally {
+      setDeletingId('');
     }
   }
 
@@ -198,6 +206,7 @@ export default function GalleryManager() {
         <button
           type="submit"
           disabled={saving}
+          aria-busy={saving}
           className="rounded-xl bg-primary px-4 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60 md:col-span-2"
         >
           {saving ? 'Saving…' : 'Add to gallery'}
@@ -205,12 +214,17 @@ export default function GalleryManager() {
       </form>
 
       {loading ? (
-        <p
-          role="status"
-          className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground"
-        >
-          Loading gallery…
-        </p>
+        <div role="status" aria-label="Loading gallery" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {[0, 1, 2].map((item) => (
+            <div key={item} aria-hidden="true" className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card">
+              <div className="h-48 bg-muted" />
+              <div className="space-y-3 p-4">
+                <div className="h-5 w-2/3 rounded bg-muted" />
+                <div className="h-4 w-full rounded bg-muted" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : images.length === 0 ? (
         <p className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           No gallery images yet.
@@ -242,26 +256,36 @@ export default function GalleryManager() {
                 <div className="flex flex-wrap gap-3 text-sm">
                   <button
                     type="button"
+                    disabled={updatingId === image.id || deletingId === image.id}
+                    aria-busy={updatingId === image.id}
                     onClick={() => void updateImage(image, { visible: !image.visible })}
-                    className="font-600 text-primary hover:underline"
+                    className="font-600 text-primary hover:underline disabled:opacity-60"
                   >
-                    {image.visible ? 'Hide' : 'Publish'}
+                    {updatingId === image.id
+                      ? 'Saving…'
+                      : image.visible
+                        ? 'Hide'
+                        : 'Publish'}
                   </button>
                   <button
                     type="button"
+                    disabled={updatingId === image.id || deletingId === image.id}
+                    aria-busy={updatingId === image.id}
                     onClick={() =>
                       void updateImage(image, { sortOrder: Math.max(0, image.sortOrder - 1) })
                     }
-                    className="font-600 text-primary hover:underline"
+                    className="font-600 text-primary hover:underline disabled:opacity-60"
                   >
-                    Move earlier
+                    {updatingId === image.id ? 'Saving…' : 'Move earlier'}
                   </button>
                   <button
                     type="button"
+                    disabled={updatingId === image.id || deletingId === image.id}
+                    aria-busy={deletingId === image.id}
                     onClick={() => void deleteImage(image)}
-                    className="font-600 text-danger hover:underline"
+                    className="font-600 text-danger hover:underline disabled:opacity-60"
                   >
-                    Delete
+                    {deletingId === image.id ? 'Deleting…' : 'Delete'}
                   </button>
                 </div>
               </div>
