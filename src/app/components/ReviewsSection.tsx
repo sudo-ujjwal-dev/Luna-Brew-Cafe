@@ -215,6 +215,7 @@ export default function ReviewsSection() {
           <button
             type="submit"
             disabled={submitting}
+            aria-busy={submitting}
             className="sm:col-span-2 rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
           >
             {submitting ? 'Submitting…' : 'Submit for review'}

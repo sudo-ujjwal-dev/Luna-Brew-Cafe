@@ -93,6 +93,7 @@ export default function MenuItemCard({ item }: MenuItemCardProps) {
           type="button"
           onClick={handleAddToCart}
           disabled={!item.available}
+          aria-live="polite"
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-600 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground active:scale-[0.98] transition-all duration-150 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
         >
           <ShoppingCart size={14} />

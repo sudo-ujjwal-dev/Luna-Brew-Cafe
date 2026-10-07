@@ -32,8 +32,6 @@ export async function GET(request: Request) {
     return NextResponse.json({
       orders: orders.map((order) => ({
         ...order,
-        subtotal: order.subtotal.toNumber(),
-        deliveryFee: order.deliveryFee.toNumber(),
         total: order.total.toNumber(),
         deliveryConfirmedAt: order.deliveryConfirmedAt?.toISOString() ?? null,
         deliveryIssueReportedAt: order.deliveryIssueReportedAt?.toISOString() ?? null,

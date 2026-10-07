@@ -20,13 +20,13 @@ interface PublicNavProps {
 }
 
 export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
-  const [scrolled, setScrolled] = useState(true);
+  const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(() => (pathname ?? currentPath) !== '/');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [customerName, setCustomerName] = useState<string | null>(null);
   const [accountError, setAccountError] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
-  const pathname = usePathname();
   const router = useRouter();
   const activePath = currentPath === '/' && pathname ? pathname : currentPath;
 
@@ -90,7 +90,10 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group">
+            <Link
+              href="/"
+              className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
               <AppLogo size={36} />
               <div className="flex flex-col leading-tight">
                 <span
@@ -116,7 +119,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                 <Link
                   key={`nav-${link.href}`}
                   href={link.href}
-                  className={`px-4 py-2 text-sm font-500 rounded-lg transition-all duration-150 nav-link-underline ${
+                  className={`px-4 py-2 text-sm font-500 rounded-lg transition-all duration-150 nav-link-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                     activePath === link.href
                       ? scrolled
                         ? 'text-primary font-600'
@@ -182,7 +185,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
               </Link>
               <Link
                 href="/#booking"
-                className="flex items-center gap-2 bg-primary text-primary-foreground text-sm font-600 px-5 py-2.5 rounded-xl hover:bg-primary/90 active:scale-95 transition-all duration-150"
+                className="flex items-center gap-2 bg-primary text-primary-foreground text-sm font-600 px-5 py-2.5 rounded-xl hover:bg-primary/90 active:scale-95 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
               >
                 Book a Table
               </Link>
@@ -191,10 +194,12 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className={`md:hidden p-2 rounded-lg transition-colors ${
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileOpen}
+              aria-controls="public-mobile-navigation"
+              className={`md:hidden p-2 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                 scrolled ? 'text-foreground hover:bg-secondary' : 'text-white hover:bg-white/10'
               }`}
-              aria-label="Toggle navigation menu"
             >
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -203,6 +208,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
 
         {/* Mobile drawer */}
         <div
+          id="public-mobile-navigation"
           className={`md:hidden transition-all duration-300 ${
             mobileOpen
               ? 'max-h-[75vh] overflow-y-auto opacity-100'

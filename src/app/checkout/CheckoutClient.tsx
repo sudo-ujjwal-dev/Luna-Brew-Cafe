@@ -307,7 +307,7 @@ export default function CheckoutClient() {
             {orderType !== 'DELIVERY'
               ? formatPrice(0)
               : deliveryFee === null
-                ? 'Loading…'
+                ? <span role="status">Calculating…</span>
                 : formatPrice(deliveryFee)}
           </span>
         </div>

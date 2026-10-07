@@ -59,7 +59,15 @@ export default function GalleryPreview() {
         </div>
 
         <div className="grid auto-rows-[140px] grid-cols-2 gap-3 md:auto-rows-[240px] md:grid-cols-3">
-          {galleryImages.map((img, index) => (
+          {loading
+            ? [0, 1, 2, 3, 4].map((item) => (
+                <div
+                  key={item}
+                  aria-hidden="true"
+                  className={`animate-pulse rounded-2xl bg-muted ${item === 0 ? 'col-span-2 row-span-2' : ''}`}
+                />
+              ))
+            : galleryImages.map((img, index) => (
             <button
               key={img.id}
               onClick={() => openLightbox(index)}
@@ -87,13 +95,9 @@ export default function GalleryPreview() {
                 </span>
               </div>
             </button>
-          ))}
+              ))}
         </div>
-        {loading && (
-          <p role="status" className="py-8 text-center text-sm text-muted-foreground">
-            Loading gallery…
-          </p>
-        )}
+        {loading && <span role="status" className="sr-only">Loading gallery images</span>}
         {error && (
           <p role="alert" className="py-8 text-center text-sm text-danger">
             {error}

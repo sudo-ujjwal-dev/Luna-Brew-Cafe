@@ -57,7 +57,11 @@ export default async function AdminDashboardPage() {
         where: { createdAt: { gte: start, lt: end }, status: { not: 'CANCELLED' } },
       }),
       prisma.order.count({
-        where: { status: { in: ['PENDING', 'CONFIRMED', 'PREPARING'] } },
+        where: {
+          status: {
+            in: ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERY_ISSUE'],
+          },
+        },
       }),
       prisma.reservation.count({
         where: {

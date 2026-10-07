@@ -160,10 +160,16 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ received }),
       });
-      const result = (await response.json()) as { status?: string; error?: string };
-      if (!response.ok || !result.status) {
+      const result = (await response.json()) as {
+        status?: string;
+        confirmedAt?: string;
+        error?: string;
+      };
+      if (!response.ok || !result.status || !result.confirmedAt) {
         throw new Error(result.error || 'Unable to save your delivery response.');
       }
+      const updatedStatus = result.status;
+      const occurredAt = result.confirmedAt;
       setData((current) =>
         current
           ? {
@@ -172,10 +178,10 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                 order.id === orderId
                   ? {
                       ...order,
-                      status: result.status!,
+                      status: updatedStatus,
                       ...(received
-                        ? { deliveryConfirmedAt: new Date().toISOString() }
-                        : { deliveryIssueReportedAt: new Date().toISOString() }),
+                        ? { deliveryConfirmedAt: occurredAt }
+                        : { deliveryIssueReportedAt: occurredAt }),
                     }
                   : order
               ),

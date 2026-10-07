@@ -39,7 +39,7 @@ function createKpiData(summary: DashboardSummary) {
       id: 'kpi-pending-orders',
       label: 'Pending Orders',
       value: String(summary.pendingOrders),
-      subValue: 'Awaiting completion',
+      subValue: 'In progress or needs attention',
       Icon: ShoppingBag,
       color: 'bg-warning-bg',
       iconColor: 'text-warning',
