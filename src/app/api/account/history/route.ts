@@ -22,6 +22,10 @@ export async function GET() {
           status: true,
           total: true,
           createdAt: true,
+          deliveryAddress: true,
+          deliveryConfirmedAt: true,
+          deliveryIssueReportedAt: true,
+          reviews: { select: { id: true, status: true } },
           items: {
             select: { itemName: true, quantity: true, unitPrice: true, lineTotal: true },
           },
@@ -36,9 +40,12 @@ export async function GET() {
     ]);
 
     return NextResponse.json({
+      customer,
       orders: orders.map((order) => ({
         ...order,
         total: order.total.toNumber(),
+        deliveryConfirmedAt: order.deliveryConfirmedAt?.toISOString() ?? null,
+        deliveryIssueReportedAt: order.deliveryIssueReportedAt?.toISOString() ?? null,
         items: order.items.map((item) => ({
           ...item,
           unitPrice: item.unitPrice.toNumber(),

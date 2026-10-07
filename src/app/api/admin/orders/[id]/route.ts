@@ -14,6 +14,7 @@ const statusSchema = z.object({
     'PREPARING',
     'READY',
     'OUT_FOR_DELIVERY',
+    'DELIVERY_ISSUE',
     'COMPLETED',
     'CANCELLED',
   ]),
@@ -31,9 +32,37 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const { id } = await context.params;
   try {
+    const existing = await prisma.order.findUnique({
+      where: { id },
+      select: { type: true, status: true },
+    });
+    if (!existing) return NextResponse.json({ error: 'Order not found.' }, { status: 404 });
+    if (existing.type === 'DELIVERY' && parsed.data.status === 'COMPLETED') {
+      return NextResponse.json(
+        { error: 'Delivery orders can only be completed when the customer confirms receipt.' },
+        { status: 409 }
+      );
+    }
+    if (existing.type !== 'DELIVERY' && parsed.data.status === 'DELIVERY_ISSUE') {
+      return NextResponse.json(
+        { error: 'Delivery issues can only be recorded on delivery orders.' },
+        { status: 400 }
+      );
+    }
+    if (existing.type === 'DELIVERY' && existing.status === 'COMPLETED') {
+      return NextResponse.json(
+        { error: 'Customer-confirmed delivery completion cannot be changed.' },
+        { status: 409 }
+      );
+    }
     const order = await prisma.order.update({
       where: { id },
-      data: { status: parsed.data.status },
+      data: {
+        status: parsed.data.status,
+        ...(existing.status === 'DELIVERY_ISSUE' && parsed.data.status !== 'DELIVERY_ISSUE'
+          ? { deliveryIssueResolvedAt: new Date() }
+          : {}),
+      },
       select: { id: true, orderNumber: true, status: true, updatedAt: true },
     });
     return NextResponse.json({ order });

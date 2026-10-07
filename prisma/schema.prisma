@@ -32,6 +32,7 @@ enum OrderStatus {
   PREPARING
   READY
   OUT_FOR_DELIVERY
+  DELIVERY_ISSUE
   COMPLETED
   CANCELLED
 }
@@ -138,6 +139,9 @@ model Order {
   deliveryAddress String?     @db.Text
   notes           String?     @db.Text
   paymentMethod   String      @default("PAY_AT_CAFE") @db.VarChar(30)
+  deliveryConfirmedAt DateTime?
+  deliveryIssueReportedAt DateTime?
+  deliveryIssueResolvedAt DateTime?
   userId          String?     @db.VarChar(30)
   user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   items           OrderItem[]
@@ -173,13 +177,12 @@ model Review {
   rating       Int
   comment      String       @db.Text
   status       ReviewStatus @default(PENDING)
-  orderId      String?      @db.VarChar(30)
+  orderId      String?      @unique @db.VarChar(30)
   order        Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
   @@index([status, createdAt])
-  @@index([orderId])
 }
 
 model ContactMessage {
@@ -216,7 +219,7 @@ model GalleryImage {
 model BusinessSettings {
   id            String   @id @default("default") @db.VarChar(30)
   businessName  String   @default("Luna Brew Café") @db.VarChar(120)
-  locationLabel String   @default("Lakeside, Pokhara, Nepal (demo area)") @db.VarChar(255)
+  locationLabel String   @default("Lakeside, Pokhara, Nepal") @db.VarChar(255)
   address       String?  @db.VarChar(255)
   phone         String?  @db.VarChar(30)
   email         String?  @db.VarChar(254)
