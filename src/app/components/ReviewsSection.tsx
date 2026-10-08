@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { Star } from 'lucide-react';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 interface ApprovedReview {
   id: string;
@@ -106,7 +107,7 @@ export default function ReviewsSection() {
               <div
                 key={item}
                 aria-hidden="true"
-                className="animate-pulse rounded-2xl border border-border bg-card p-6"
+                className="animate-pulse rounded-2xl border border-border bg-card p-6 motion-reduce:animate-none"
               >
                 <div className="h-4 w-24 rounded bg-muted" />
                 <div className="mt-5 h-4 w-full rounded bg-muted" />
@@ -224,8 +225,9 @@ export default function ReviewsSection() {
             type="submit"
             disabled={submitting}
             aria-busy={submitting}
-            className="sm:col-span-2 rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
+            className="sm:col-span-2 flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
           >
+            {submitting && <InlineSpinner />}
             {submitting ? 'Submitting…' : 'Submit for review'}
           </button>
         </form>

@@ -109,9 +109,29 @@ export default function RevenuePanel() {
         </p>
       )}
       {loading && !data ? (
-        <p role="status" className="py-10 text-center text-sm text-muted-foreground">
-          Loading completed-order revenue…
-        </p>
+        <div role="status" aria-label="Loading completed-order revenue" className="mt-5">
+          <span className="sr-only">Loading revenue totals and trend</span>
+          <div aria-hidden="true" className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+            {[0, 1, 2, 3, 4, 5].map((item) => (
+              <div
+                key={item}
+                className="animate-pulse rounded-xl bg-secondary/60 p-3 motion-reduce:animate-none"
+              >
+                <div className="h-3 w-20 rounded bg-muted" />
+                <div className="mt-3 h-6 w-28 max-w-full rounded bg-muted" />
+              </div>
+            ))}
+          </div>
+          <div
+            aria-hidden="true"
+            className="mt-5 h-48 animate-pulse rounded-xl bg-secondary/60 motion-reduce:animate-none"
+          >
+            <div className="px-4 pt-4">
+              <div className="h-4 w-32 rounded bg-muted" />
+              <div className="mt-5 h-28 rounded-lg bg-muted/70" />
+            </div>
+          </div>
+        </div>
       ) : data ? (
         <>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">

@@ -24,7 +24,7 @@ export default function CartClient() {
             <div
               key={item}
               aria-hidden="true"
-              className="animate-pulse rounded-2xl border border-border bg-card p-4"
+              className="animate-pulse rounded-2xl border border-border bg-card p-4 motion-reduce:animate-none"
             >
               <div className="flex gap-4">
                 <div className="h-24 w-24 rounded-xl bg-muted" />
@@ -39,7 +39,7 @@ export default function CartClient() {
         </div>
         <div
           aria-hidden="true"
-          className="h-48 animate-pulse rounded-2xl border border-border bg-card p-5"
+          className="h-48 animate-pulse rounded-2xl border border-border bg-card p-5 motion-reduce:animate-none"
         >
           <div className="h-5 w-32 rounded bg-muted" />
           <div className="mt-6 h-4 w-full rounded bg-muted" />

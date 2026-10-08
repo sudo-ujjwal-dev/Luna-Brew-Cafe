@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 interface AccountData {
   customer: { id: string; name: string; email: string } | null;
@@ -40,7 +41,12 @@ const orderStatusLabels: Record<string, string> = {
 };
 
 function SkeletonBlock({ className = '' }: { className?: string }) {
-  return <div aria-hidden="true" className={`animate-pulse rounded-lg bg-muted ${className}`} />;
+  return (
+    <div
+      aria-hidden="true"
+      className={`animate-pulse rounded-lg bg-muted motion-reduce:animate-none ${className}`}
+    />
+  );
 }
 
 function AccountSkeleton() {
@@ -289,8 +295,9 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
           onClick={() => void logout()}
           disabled={loggingOut}
           aria-busy={loggingOut}
-          className="rounded-xl border border-border px-4 py-2.5 text-sm font-600 text-foreground hover:bg-secondary disabled:cursor-wait disabled:opacity-60"
+          className="flex items-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-600 text-foreground hover:bg-secondary disabled:cursor-wait disabled:opacity-60"
         >
+          {loggingOut && <InlineSpinner />}
           {loggingOut ? 'Signing out…' : 'Log out'}
         </button>
       </section>
@@ -419,8 +426,9 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                           disabled={confirmationOrderId === order.id}
                           aria-busy={confirmationOrderId === order.id}
                           onClick={() => void confirmDelivery(order.id, true)}
-                          className="rounded-xl bg-primary px-4 py-2.5 text-sm font-600 text-primary-foreground disabled:cursor-wait disabled:opacity-60"
+                          className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-600 text-primary-foreground disabled:cursor-wait disabled:opacity-60"
                         >
+                          {confirmationOrderId === order.id && <InlineSpinner />}
                           {confirmationOrderId === order.id ? 'Saving…' : 'Yes, I received it'}
                         </button>
                         <button
@@ -487,8 +495,9 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                         type="submit"
                         disabled={reviewOrderId === order.id}
                         aria-busy={reviewOrderId === order.id}
-                        className="self-end rounded-xl bg-primary px-4 py-2.5 text-sm font-600 text-primary-foreground disabled:cursor-wait disabled:opacity-60"
+                        className="flex items-center gap-2 self-end rounded-xl bg-primary px-4 py-2.5 text-sm font-600 text-primary-foreground disabled:cursor-wait disabled:opacity-60"
                       >
+                        {reviewOrderId === order.id && <InlineSpinner />}
                         {reviewOrderId === order.id ? 'Submitting…' : 'Leave a review'}
                       </button>
                     </form>

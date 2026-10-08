@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 export type RecordKind = 'orders' | 'reservations' | 'reviews' | 'contact';
 
@@ -248,7 +249,7 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
             <div
               key={item}
               aria-hidden="true"
-              className="animate-pulse rounded-2xl border border-border bg-card p-5"
+              className="animate-pulse rounded-2xl border border-border bg-card p-5 motion-reduce:animate-none"
             >
               <div className="h-5 w-40 rounded bg-muted" />
               <div className="mt-3 h-4 w-2/3 rounded bg-muted" />
@@ -368,13 +369,22 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
                       </option>
                     ))}
                   </select>
+                  {updatingId === row.id && (
+                    <p
+                      role="status"
+                      className="inline-flex items-center gap-2 text-xs text-muted-foreground"
+                    >
+                      <InlineSpinner /> Updating status…
+                    </p>
+                  )}
                   {kind === 'contact' && (
                     <button
                       type="button"
                       disabled={deletingId === row.id}
                       onClick={() => void deleteContactMessage(row)}
-                      className="rounded-xl border border-danger/30 px-3 py-2 text-sm font-600 text-danger hover:bg-danger-bg disabled:opacity-60"
+                      className="flex items-center justify-center gap-2 rounded-xl border border-danger/30 px-3 py-2 text-sm font-600 text-danger hover:bg-danger-bg disabled:opacity-60"
                     >
+                      {deletingId === row.id && <InlineSpinner />}
                       {deletingId === row.id ? 'Deleting…' : 'Delete message'}
                     </button>
                   )}

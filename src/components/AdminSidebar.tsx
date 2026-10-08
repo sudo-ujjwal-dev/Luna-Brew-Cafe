@@ -18,6 +18,7 @@ import {
   Images,
 } from 'lucide-react';
 import { useAdminUnreadCounts } from './AdminNotificationState';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 const navGroups = [
   {
@@ -45,6 +46,7 @@ const navGroups = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const unreadCounts = useAdminUnreadCounts();
 
   return (
@@ -155,15 +157,21 @@ export default function AdminSidebar() {
           <Globe size={18} className="flex-shrink-0" />
           {!collapsed && <span className="hidden font-500 md:inline">View Website</span>}
         </Link>
-        <form action="/api/admin/logout" method="post">
+        <form action="/api/admin/logout" method="post" onSubmit={() => setLoggingOut(true)}>
           <button
+            disabled={loggingOut}
+            aria-busy={loggingOut}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-danger hover:bg-danger-bg transition-all duration-150 w-full ${
               collapsed ? 'justify-center' : ''
-            }`}
-            title="Sign Out"
+            } disabled:cursor-wait disabled:opacity-60`}
+            title={loggingOut ? 'Signing out…' : 'Sign Out'}
           >
-            <LogOut size={18} className="flex-shrink-0" />
-            {!collapsed && <span className="hidden font-500 md:inline">Sign Out</span>}
+            {loggingOut ? <InlineSpinner /> : <LogOut size={18} className="flex-shrink-0" />}
+            {!collapsed && (
+              <span className="hidden font-500 md:inline">
+                {loggingOut ? 'Signing out…' : 'Sign Out'}
+              </span>
+            )}
           </button>
         </form>
 

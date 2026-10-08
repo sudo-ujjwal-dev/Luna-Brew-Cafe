@@ -49,23 +49,53 @@ export async function GET(request: Request) {
   }
 }
 
-const readAllSchema = z.object({ markAllRead: z.literal(true) });
+const markReadSchema = z.union([
+  z.object({ markAllRead: z.literal(true) }),
+  z.object({
+    readTypes: z
+      .array(
+        z.enum([
+          'NEW_ORDER',
+          'NEW_RESERVATION',
+          'NEW_REVIEW',
+          'NEW_CONTACT_MESSAGE',
+          'DELIVERY_ISSUE',
+        ])
+      )
+      .min(1),
+  }),
+]);
 
 export async function PATCH(request: Request) {
   const authorizationError = await adminAuthorizationError(request, true);
   if (authorizationError) return authorizationError;
 
-  const parsed = readAllSchema.safeParse(await request.json().catch(() => null));
+  const parsed = markReadSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Provide a valid mark-all-read request.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Provide valid notification read details.' },
+      { status: 400 }
+    );
   }
 
   try {
-    const result = await prisma.notification.updateMany({
-      where: { readAt: null },
+    const where = {
+      readAt: null,
+      ...('readTypes' in parsed.data ? { type: { in: parsed.data.readTypes } } : {}),
+    };
+    const updated = await prisma.notification.updateMany({
+      where,
       data: { readAt: new Date() },
     });
-    return NextResponse.json({ updated: result.count });
+    const unreadByType = await prisma.notification.groupBy({
+      by: ['type'],
+      where: { readAt: null },
+      _count: { _all: true },
+    });
+    return NextResponse.json({
+      updated: updated.count,
+      unreadCounts: Object.fromEntries(unreadByType.map(({ type, _count }) => [type, _count._all])),
+    });
   } catch (error) {
     console.error('Admin mark-all-notifications-read failed:', error);
     return NextResponse.json({ error: 'Unable to update notifications.' }, { status: 503 });

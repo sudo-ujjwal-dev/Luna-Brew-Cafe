@@ -64,7 +64,7 @@ export default function GalleryPreview() {
                 <div
                   key={item}
                   aria-hidden="true"
-                  className={`animate-pulse rounded-2xl bg-muted ${item === 0 ? 'col-span-2 row-span-2' : ''}`}
+                  className={`animate-pulse rounded-2xl bg-muted motion-reduce:animate-none ${item === 0 ? 'col-span-2 row-span-2' : ''}`}
                 />
               ))
             : galleryImages.map((img, index) => (

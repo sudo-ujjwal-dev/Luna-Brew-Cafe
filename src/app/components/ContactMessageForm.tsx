@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 export default function ContactMessageForm() {
   const [error, setError] = useState('');
@@ -148,8 +149,9 @@ export default function ContactMessageForm() {
         type="submit"
         disabled={submitting}
         aria-busy={submitting}
-        className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
       >
+        {submitting && <InlineSpinner />}
         {submitting ? 'Sending…' : 'Send message'}
       </button>
     </form>

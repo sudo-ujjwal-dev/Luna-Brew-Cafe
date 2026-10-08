@@ -175,7 +175,7 @@ export default function MenuClient() {
             <div
               key={item}
               aria-hidden="true"
-              className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card"
+              className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card motion-reduce:animate-none"
             >
               <div className="h-44 bg-muted" />
               <div className="space-y-3 p-4">

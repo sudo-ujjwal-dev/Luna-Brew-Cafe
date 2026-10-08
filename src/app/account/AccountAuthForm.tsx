@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 export default function AccountAuthForm({ mode }: { mode: 'login' | 'register' }) {
   const router = useRouter();
@@ -122,9 +123,16 @@ export default function AccountAuthForm({ mode }: { mode: 'login' | 'register' }
         type="submit"
         disabled={submitting}
         aria-busy={submitting}
-        className="w-full rounded-xl bg-primary py-3 text-sm font-700 text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-700 text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {submitting ? 'Please wait…' : registering ? 'Create Account' : 'Login'}
+        {submitting && <InlineSpinner />}
+        {submitting
+          ? registering
+            ? 'Creating account…'
+            : 'Signing in…'
+          : registering
+            ? 'Create Account'
+            : 'Login'}
       </button>
       <p className="text-center text-sm text-muted-foreground">
         {registering ? 'Already have an account?' : "Don't have an account?"}{' '}

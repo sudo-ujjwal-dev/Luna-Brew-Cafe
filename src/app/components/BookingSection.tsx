@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CalendarDays, Users, Clock } from 'lucide-react';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 interface BookingForm {
   name: string;
@@ -334,7 +335,8 @@ export default function BookingSection() {
                   aria-busy={isSubmitting}
                   className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-700 py-3.5 rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? 'Saving reservation…' : 'Request reservation'}
+                  {isSubmitting && <InlineSpinner />}
+                  {isSubmitting ? 'Booking…' : 'Request reservation'}
                 </button>
               </form>
             )}

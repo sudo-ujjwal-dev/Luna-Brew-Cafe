@@ -6,6 +6,7 @@ import AppLogo from '@/components/ui/AppLogo';
 import { Menu, X, ShoppingBag, UserRound } from 'lucide-react';
 import { cartItemCount, readCart, subscribeToCart } from '@/lib/cart';
 import { usePathname, useRouter } from 'next/navigation';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -154,12 +155,13 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                     onClick={() => void logout()}
                     disabled={loggingOut}
                     aria-busy={loggingOut}
-                    className={`rounded-lg px-3 py-2 text-sm font-600 transition-colors disabled:cursor-wait disabled:opacity-60 ${
+                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-600 transition-colors disabled:cursor-wait disabled:opacity-60 ${
                       scrolled
                         ? 'text-foreground hover:bg-secondary'
                         : 'text-white hover:bg-white/10'
                     }`}
                   >
+                    {loggingOut && <InlineSpinner />}
                     {loggingOut ? 'Signing out…' : 'Log out'}
                   </button>
                 </>

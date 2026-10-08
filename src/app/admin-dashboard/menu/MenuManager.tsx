@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type FormEvent } from 'react';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 interface Category {
   id: string;
@@ -369,8 +370,9 @@ export default function MenuManager() {
               type="submit"
               disabled={saving || activeCategories.length === 0}
               aria-busy={saving}
-              className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60"
             >
+              {saving && <InlineSpinner />}
               {saving ? 'Saving…' : editingId ? 'Save changes' : 'Create menu item'}
             </button>
             {editingId && (
@@ -414,8 +416,9 @@ export default function MenuManager() {
                 type="submit"
                 disabled={categorySaving}
                 aria-busy={categorySaving}
-                className="rounded-xl bg-primary px-3 py-2 text-sm font-600 text-primary-foreground disabled:cursor-wait disabled:opacity-60"
+                className="flex items-center gap-2 rounded-xl bg-primary px-3 py-2 text-sm font-600 text-primary-foreground disabled:cursor-wait disabled:opacity-60"
               >
+                {categorySaving && <InlineSpinner />}
                 {categorySaving ? 'Adding…' : 'Add'}
               </button>
             </form>
@@ -436,11 +439,15 @@ export default function MenuManager() {
                   onClick={() => void toggleCategory(category)}
                   className="text-xs font-600 text-primary hover:underline disabled:cursor-wait disabled:opacity-60"
                 >
-                  {changingCategoryId === category.id
-                    ? 'Saving…'
-                    : category.active
-                      ? 'Deactivate'
-                      : 'Reactivate'}
+                  {changingCategoryId === category.id ? (
+                    <>
+                      <InlineSpinner /> Saving…
+                    </>
+                  ) : category.active ? (
+                    'Deactivate'
+                  ) : (
+                    'Reactivate'
+                  )}
                 </button>
               </li>
             ))}
@@ -456,7 +463,7 @@ export default function MenuManager() {
           <div
             role="status"
             aria-label="Loading menu items"
-            className="animate-pulse space-y-4 p-5"
+            className="animate-pulse space-y-4 p-5 motion-reduce:animate-none"
           >
             <span className="sr-only">Loading menu items</span>
             {[0, 1, 2, 3].map((item) => (
@@ -518,7 +525,13 @@ export default function MenuManager() {
                             onClick={() => void deactivateItem(item)}
                             className="font-600 text-danger hover:underline disabled:cursor-wait disabled:opacity-60"
                           >
-                            {updatingId === item.id ? 'Saving…' : 'Deactivate'}
+                            {updatingId === item.id ? (
+                              <span className="inline-flex items-center gap-2">
+                                <InlineSpinner /> Saving…
+                              </span>
+                            ) : (
+                              'Deactivate'
+                            )}
                           </button>
                         )}
                       </div>

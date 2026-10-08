@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCartProducts } from '@/lib/use-cart-products';
 import { clearCart } from '@/lib/cart';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY';
 
@@ -99,7 +100,7 @@ export default function CheckoutClient() {
         <span className="sr-only">Preparing checkout form</span>
         <div
           aria-hidden="true"
-          className="h-[560px] animate-pulse rounded-2xl border border-border bg-card p-6"
+          className="h-[560px] animate-pulse rounded-2xl border border-border bg-card p-6 motion-reduce:animate-none"
         >
           <div className="h-5 w-56 rounded bg-muted" />
           {[0, 1, 2, 3].map((item) => (
@@ -111,7 +112,7 @@ export default function CheckoutClient() {
         </div>
         <div
           aria-hidden="true"
-          className="h-64 animate-pulse rounded-2xl border border-border bg-card p-5"
+          className="h-64 animate-pulse rounded-2xl border border-border bg-card p-5 motion-reduce:animate-none"
         >
           <div className="h-5 w-32 rounded bg-muted" />
           <div className="mt-6 h-4 w-full rounded bg-muted" />
@@ -312,8 +313,9 @@ export default function CheckoutClient() {
           type="submit"
           disabled={submitting || (orderType === 'DELIVERY' && deliveryFee === null)}
           aria-busy={submitting}
-          className="w-full rounded-xl bg-primary py-3.5 text-sm font-700 text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-700 text-primary-foreground disabled:cursor-not-allowed disabled:opacity-60"
         >
+          {submitting && <InlineSpinner />}
           {submitting ? 'Placing order…' : 'Place order'}
         </button>
       </form>

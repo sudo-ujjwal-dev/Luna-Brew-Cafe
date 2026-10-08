@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import AppImage from '@/components/ui/AppImage';
+import InlineSpinner from '@/components/ui/InlineSpinner';
 
 interface GalleryImage {
   id: string;
@@ -207,8 +208,9 @@ export default function GalleryManager() {
           type="submit"
           disabled={saving}
           aria-busy={saving}
-          className="rounded-xl bg-primary px-4 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60 md:col-span-2"
+          className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-700 text-primary-foreground disabled:opacity-60 md:col-span-2"
         >
+          {saving && <InlineSpinner />}
           {saving ? 'Saving…' : 'Add to gallery'}
         </button>
       </form>
@@ -223,7 +225,7 @@ export default function GalleryManager() {
             <div
               key={item}
               aria-hidden="true"
-              className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card"
+              className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card motion-reduce:animate-none"
             >
               <div className="h-48 bg-muted" />
               <div className="space-y-3 p-4">
@@ -269,7 +271,15 @@ export default function GalleryManager() {
                     onClick={() => void updateImage(image, { visible: !image.visible })}
                     className="font-600 text-primary hover:underline disabled:opacity-60"
                   >
-                    {updatingId === image.id ? 'Saving…' : image.visible ? 'Hide' : 'Publish'}
+                    {updatingId === image.id ? (
+                      <span className="inline-flex items-center gap-2">
+                        <InlineSpinner /> Saving…
+                      </span>
+                    ) : image.visible ? (
+                      'Hide'
+                    ) : (
+                      'Publish'
+                    )}
                   </button>
                   <button
                     type="button"
@@ -280,7 +290,13 @@ export default function GalleryManager() {
                     }
                     className="font-600 text-primary hover:underline disabled:opacity-60"
                   >
-                    {updatingId === image.id ? 'Saving…' : 'Move earlier'}
+                    {updatingId === image.id ? (
+                      <span className="inline-flex items-center gap-2">
+                        <InlineSpinner /> Saving…
+                      </span>
+                    ) : (
+                      'Move earlier'
+                    )}
                   </button>
                   <button
                     type="button"
@@ -289,7 +305,13 @@ export default function GalleryManager() {
                     onClick={() => void deleteImage(image)}
                     className="font-600 text-danger hover:underline disabled:opacity-60"
                   >
-                    {deletingId === image.id ? 'Deleting…' : 'Delete'}
+                    {deletingId === image.id ? (
+                      <span className="inline-flex items-center gap-2">
+                        <InlineSpinner /> Deleting…
+                      </span>
+                    ) : (
+                      'Delete'
+                    )}
                   </button>
                 </div>
               </div>
