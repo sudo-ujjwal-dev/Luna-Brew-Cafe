@@ -120,16 +120,18 @@ export default function AdminSidebar() {
                       )}
                       {!collapsed && badgeCount > 0 && (
                         <span
-                          aria-label={`${badgeCount} unread`}
-                          className="min-w-5 rounded-full bg-accent px-1.5 py-0.5 text-center text-xs font-700 leading-none text-accent-foreground"
+                          aria-hidden="true"
+                          className="hidden min-w-5 rounded-full bg-accent px-1.5 py-0.5 text-center text-xs font-700 leading-none text-accent-foreground md:inline-flex md:items-center md:justify-center"
                         >
                           {badgeLabel}
                         </span>
                       )}
-                      {collapsed && badgeCount > 0 && (
+                      {badgeCount > 0 && (
                         <span
-                          aria-label={`${badgeCount} unread`}
-                          className="absolute right-1 top-1 h-2 w-2 rounded-full bg-accent"
+                          aria-hidden="true"
+                          className={`absolute right-1 top-1 h-2 w-2 rounded-full bg-accent ${
+                            collapsed ? '' : 'md:hidden'
+                          }`}
                         />
                       )}
                     </Link>
