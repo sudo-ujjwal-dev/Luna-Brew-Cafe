@@ -145,7 +145,7 @@ model Order {
   userId                  String?     @db.VarChar(30)
   user                    User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   items                   OrderItem[]
-  reviews                 Review[]
+  review                  Review?
   createdAt               DateTime    @default(now())
   updatedAt               DateTime    @updatedAt
 

@@ -55,9 +55,7 @@ export default function ContactMessageForm() {
     >
       <div>
         <h3 className="font-700 text-foreground">Send a message</h3>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Send a message to the café team.
-        </p>
+        <p className="mt-1 text-xs text-muted-foreground">Send a message to the café team.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>

@@ -91,9 +91,16 @@ export default function CheckoutClient() {
 
   if (loading) {
     return (
-      <div role="status" aria-label="Loading checkout" className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
+      <div
+        role="status"
+        aria-label="Loading checkout"
+        className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]"
+      >
         <span className="sr-only">Preparing checkout form</span>
-        <div aria-hidden="true" className="h-[560px] animate-pulse rounded-2xl border border-border bg-card p-6">
+        <div
+          aria-hidden="true"
+          className="h-[560px] animate-pulse rounded-2xl border border-border bg-card p-6"
+        >
           <div className="h-5 w-56 rounded bg-muted" />
           {[0, 1, 2, 3].map((item) => (
             <div key={item} className="mt-8">
@@ -102,7 +109,10 @@ export default function CheckoutClient() {
             </div>
           ))}
         </div>
-        <div aria-hidden="true" className="h-64 animate-pulse rounded-2xl border border-border bg-card p-5">
+        <div
+          aria-hidden="true"
+          className="h-64 animate-pulse rounded-2xl border border-border bg-card p-5"
+        >
           <div className="h-5 w-32 rounded bg-muted" />
           <div className="mt-6 h-4 w-full rounded bg-muted" />
           <div className="mt-3 h-4 w-2/3 rounded bg-muted" />
@@ -166,6 +176,29 @@ export default function CheckoutClient() {
             ))}
           </div>
         </fieldset>
+
+        {orderType === 'DELIVERY' && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground"
+          >
+            <p>
+              Delivery orders must be placed while signed in so you can follow progress and confirm
+              receipt.
+            </p>
+            <p className="mt-2">
+              <Link href="/account/login" className="font-600 text-primary underline">
+                Sign in
+              </Link>
+              {' or '}
+              <Link href="/account/register" className="font-600 text-primary underline">
+                create an account
+              </Link>
+              {' before placing your delivery order.'}
+            </p>
+          </div>
+        )}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -304,11 +337,13 @@ export default function CheckoutClient() {
         <div className="mt-2 flex justify-between text-sm">
           <span className="text-muted-foreground">Delivery fee</span>
           <span className="text-foreground">
-            {orderType !== 'DELIVERY'
-              ? formatPrice(0)
-              : deliveryFee === null
-                ? <span role="status">Calculating…</span>
-                : formatPrice(deliveryFee)}
+            {orderType !== 'DELIVERY' ? (
+              formatPrice(0)
+            ) : deliveryFee === null ? (
+              <span role="status">Calculating…</span>
+            ) : (
+              formatPrice(deliveryFee)
+            )}
           </span>
         </div>
         <div className="mt-3 flex justify-between border-t border-border pt-3 font-700">

@@ -24,9 +24,7 @@ export default function HeroSection() {
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
           <MapPin size={12} className="text-accent" />
-          <span className="text-white/90 text-xs font-500">
-            Lakeside, Pokhara, Nepal
-          </span>
+          <span className="text-white/90 text-xs font-500">Lakeside, Pokhara, Nepal</span>
         </div>
 
         <h1 className="text-hero font-800 text-white mb-4 text-balance">

@@ -29,7 +29,7 @@ export async function POST(request: Request, context: RouteContext) {
         type: true,
         status: true,
         deliveryConfirmedAt: true,
-        reviews: { select: { id: true } },
+        review: { select: { id: true } },
       },
     });
     if (!order) return NextResponse.json({ error: 'Order not found.' }, { status: 404 });
@@ -42,8 +42,11 @@ export async function POST(request: Request, context: RouteContext) {
         { status: 409 }
       );
     }
-    if (order.reviews.length > 0) {
-      return NextResponse.json({ error: 'A review has already been submitted for this order.' }, { status: 409 });
+    if (order.review) {
+      return NextResponse.json(
+        { error: 'A review has already been submitted for this order.' },
+        { status: 409 }
+      );
     }
     const review = await prisma.review.create({
       data: {

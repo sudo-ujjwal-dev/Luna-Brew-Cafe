@@ -29,6 +29,12 @@ export async function POST(request: Request) {
   try {
     const submitted = parsed.data;
     const customer = await getCustomerSession();
+    if (submitted.type === 'DELIVERY' && !customer) {
+      return NextResponse.json(
+        { error: 'Sign in to your customer account before placing a delivery order.' },
+        { status: 401 }
+      );
+    }
     const requestedIds = submitted.items.map((item) => item.menuItemId);
     const menuItems = await prisma.menuItem.findMany({
       where: { id: { in: requestedIds }, available: true, category: { active: true } },

@@ -453,7 +453,11 @@ export default function MenuManager() {
           <h2 className="text-lg font-700 text-foreground">Menu items</h2>
         </div>
         {loading ? (
-          <div role="status" aria-label="Loading menu items" className="animate-pulse space-y-4 p-5">
+          <div
+            role="status"
+            aria-label="Loading menu items"
+            className="animate-pulse space-y-4 p-5"
+          >
             <span className="sr-only">Loading menu items</span>
             {[0, 1, 2, 3].map((item) => (
               <div key={item} aria-hidden="true" className="grid grid-cols-5 gap-4">

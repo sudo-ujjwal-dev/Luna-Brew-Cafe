@@ -19,7 +19,10 @@ export async function POST(request: Request, context: RouteContext) {
   }
   const parsed = confirmationSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Choose a delivery confirmation response.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Choose a delivery confirmation response.' },
+      { status: 400 }
+    );
   }
 
   const { id } = await context.params;

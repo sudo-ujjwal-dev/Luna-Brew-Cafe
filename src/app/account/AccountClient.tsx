@@ -16,7 +16,7 @@ interface AccountData {
     deliveryAddress: string | null;
     deliveryConfirmedAt: string | null;
     deliveryIssueReportedAt: string | null;
-    reviews: Array<{ id: string; status: string }>;
+    review: { id: string; status: string } | null;
     items: Array<{ itemName: string; quantity: number }>;
   }>;
   reservations: Array<{
@@ -232,7 +232,7 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
           ? {
               ...current,
               orders: current.orders.map((order) =>
-                order.id === orderId ? { ...order, reviews: [result.review!] } : order
+                order.id === orderId ? { ...order, review: result.review! } : order
               ),
             }
           : current
@@ -250,7 +250,9 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
   if (error && !data) {
     return (
       <div className="rounded-2xl border border-border bg-card p-6">
-        <p role="alert" className="text-sm text-danger">{error}</p>
+        <p role="alert" className="text-sm text-danger">
+          {error}
+        </p>
         <button
           type="button"
           onClick={() => void loadAccount()}
@@ -310,13 +312,34 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
               const showReview =
                 order.status === 'COMPLETED' &&
                 (order.type !== 'DELIVERY' || order.deliveryConfirmedAt !== null);
-              const submittedReview = order.reviews[0];
+              const submittedReview = order.review;
+              const deliveryTimeline = order.type === 'DELIVERY';
+              const timelineSteps = deliveryTimeline
+                ? [
+                    ['PENDING', 'Received'],
+                    ['CONFIRMED', 'Confirmed'],
+                    ['PREPARING', 'Preparing'],
+                    ['READY', 'Ready'],
+                    ['OUT_FOR_DELIVERY', 'On the way'],
+                    ['COMPLETED', 'Delivered'],
+                  ]
+                : [
+                    ['PENDING', 'Received'],
+                    ['CONFIRMED', 'Confirmed'],
+                    ['PREPARING', 'Preparing'],
+                    ['READY', 'Ready'],
+                    ['COMPLETED', 'Completed'],
+                  ];
+              const activeStep = timelineSteps.findIndex(([status]) => status === order.status);
               return (
                 <article key={order.id} className="rounded-2xl border border-border bg-card p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <h3 className="font-700 text-foreground">Order {order.orderNumber}</h3>
-                      <time className="mt-1 block text-xs text-muted-foreground" dateTime={order.createdAt}>
+                      <time
+                        className="mt-1 block text-xs text-muted-foreground"
+                        dateTime={order.createdAt}
+                      >
                         {new Date(order.createdAt).toLocaleString('en-NP', {
                           dateStyle: 'medium',
                           timeStyle: 'short',
@@ -324,8 +347,12 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                       </time>
                     </div>
                     <div className="text-right">
-                      <p className="font-700 text-primary">Rs. {order.total.toLocaleString('en-NP')}</p>
-                      <span className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-600 ${statusStyle(order.status)}`}>
+                      <p className="font-700 text-primary">
+                        Rs. {order.total.toLocaleString('en-NP')}
+                      </p>
+                      <span
+                        className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-600 ${statusStyle(order.status)}`}
+                      >
                         {statusLabel(order.status)}
                       </span>
                     </div>
@@ -334,17 +361,48 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                     {order.items.map((item) => `${item.itemName} × ${item.quantity}`).join(', ')}
                   </p>
                   <p className="mt-2 text-xs font-600 text-foreground">
-                    {order.type === 'DELIVERY' ? 'Delivery' : order.type === 'DINE_IN' ? 'Dine-in' : 'Takeaway'}
+                    {order.type === 'DELIVERY'
+                      ? 'Delivery'
+                      : order.type === 'DINE_IN'
+                        ? 'Dine-in'
+                        : 'Takeaway'}
                   </p>
                   {order.type === 'DELIVERY' && order.deliveryAddress && (
                     <p className="mt-1 text-xs text-muted-foreground">{order.deliveryAddress}</p>
                   )}
+                  {activeStep >= 0 && (
+                    <ol
+                      aria-label="Order progress"
+                      className={`mt-5 grid gap-2 ${deliveryTimeline ? 'grid-cols-3 sm:grid-cols-6' : 'grid-cols-3 sm:grid-cols-5'}`}
+                    >
+                      {timelineSteps.map(([status, label], index) => (
+                        <li
+                          key={status}
+                          aria-current={index === activeStep ? 'step' : undefined}
+                          className={`flex flex-col items-center gap-1 text-center text-[10px] sm:text-xs ${
+                            index <= activeStep ? 'text-primary' : 'text-muted-foreground'
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`h-2.5 w-2.5 rounded-full ${
+                              index <= activeStep ? 'bg-primary' : 'bg-border'
+                            }`}
+                          />
+                          {label}
+                        </li>
+                      ))}
+                    </ol>
+                  )}
 
                   {order.status === 'DELIVERY_ISSUE' ? (
                     <div className="mt-4 rounded-xl border border-danger/20 bg-danger-bg p-4">
-                      <p className="text-sm font-600 text-danger">The café team is reviewing your delivery issue.</p>
+                      <p className="text-sm font-600 text-danger">
+                        The café team is reviewing your delivery issue.
+                      </p>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        We have recorded that you did not receive your order. You cannot confirm receipt unless the café resolves the issue.
+                        We have recorded that you did not receive your order. You cannot confirm
+                        receipt unless the café resolves the issue.
                       </p>
                     </div>
                   ) : order.type === 'DELIVERY' &&
@@ -379,23 +437,6 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                   ) : null}
 
                   {order.type === 'DELIVERY' &&
-                    order.status === 'OUT_FOR_DELIVERY' &&
-                    !order.deliveryConfirmedAt && (
-                      <ol aria-label="Delivery progress" className="mt-5 flex items-center">
-                        {['Order received', 'Preparing', 'On the way', 'Your confirmation'].map((step, index) => (
-                          <li
-                            key={step}
-                            className={`flex-1 border-t-2 pt-2 text-center text-[10px] sm:text-xs ${
-                              index < 2 ? 'border-primary text-primary' : 'border-border text-muted-foreground'
-                            }`}
-                          >
-                            {step}
-                          </li>
-                        ))}
-                      </ol>
-                    )}
-
-                  {order.type === 'DELIVERY' &&
                     order.status === 'COMPLETED' &&
                     !order.deliveryConfirmedAt && (
                       <p className="mt-4 rounded-xl bg-secondary p-3 text-sm text-muted-foreground">
@@ -404,8 +445,12 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                     )}
 
                   {showReview && submittedReview ? (
-                    <p role="status" className="mt-4 rounded-xl bg-success-bg p-3 text-sm text-success">
-                      Review submitted{submittedReview.status === 'PENDING' ? ' — awaiting moderation.' : '.'}
+                    <p
+                      role="status"
+                      className="mt-4 rounded-xl bg-success-bg p-3 text-sm text-success"
+                    >
+                      Review submitted
+                      {submittedReview.status === 'PENDING' ? ' — awaiting moderation.' : '.'}
                     </p>
                   ) : showReview ? (
                     <form
@@ -421,7 +466,9 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                           className="mt-1 block w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
                         >
                           {[5, 4, 3, 2, 1].map((rating) => (
-                            <option key={rating} value={rating}>{rating} {rating === 1 ? 'star' : 'stars'}</option>
+                            <option key={rating} value={rating}>
+                              {rating} {rating === 1 ? 'star' : 'stars'}
+                            </option>
                           ))}
                         </select>
                       </label>
@@ -473,10 +520,13 @@ export default function AccountClient({ welcome = false }: { welcome?: boolean }
                     })}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {reservation.time} · {reservation.guestCount} {reservation.guestCount === 1 ? 'guest' : 'guests'}
+                    {reservation.time} · {reservation.guestCount}{' '}
+                    {reservation.guestCount === 1 ? 'guest' : 'guests'}
                   </p>
                 </div>
-                <span className={`rounded-full px-3 py-1 text-xs font-600 ${statusStyle(reservation.status)}`}>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-600 ${statusStyle(reservation.status)}`}
+                >
                   {reservation.status.toLowerCase().replaceAll('_', ' ')}
                 </span>
               </article>

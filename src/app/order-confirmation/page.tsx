@@ -44,7 +44,8 @@ export default async function OrderConfirmationPage({ searchParams }: OrderConfi
           {order ? (
             <>
               <p className="mt-3 text-sm text-muted-foreground">
-                Your order is saved. Sign in to your account to follow its progress and confirm delivery.
+                Your order is saved. Sign in to your account to follow its progress and confirm
+                delivery.
               </p>
               <dl className="mt-6 space-y-3 rounded-xl bg-secondary/50 p-4 text-left text-sm">
                 <div className="flex justify-between gap-3">

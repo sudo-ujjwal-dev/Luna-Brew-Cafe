@@ -205,26 +205,41 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
 
   return (
     <div className="space-y-4">
-      {(error || notice) && (
-        <p
-          role={error ? 'alert' : 'status'}
-          className={`rounded-xl p-4 text-sm ${error ? 'bg-danger-bg text-danger' : 'bg-success-bg text-success'}`}
-        >
-          {error || notice}
+      {error && (
+        <p role="alert" className="rounded-xl bg-danger-bg p-4 text-sm text-danger">
+          {error}
+          {!loading && (
+            <button
+              type="button"
+              onClick={() => void loadRecords()}
+              className="ml-3 font-700 underline"
+            >
+              Try again
+            </button>
+          )}
+        </p>
+      )}
+      {notice && !error && (
+        <p role="status" className="rounded-xl bg-success-bg p-4 text-sm text-success">
+          {notice}
         </p>
       )}
       {loading ? (
         <div role="status" aria-label={`Loading ${kind}`} className="space-y-3">
           <span className="sr-only">Loading records</span>
           {[0, 1, 2].map((item) => (
-            <div key={item} aria-hidden="true" className="animate-pulse rounded-2xl border border-border bg-card p-5">
+            <div
+              key={item}
+              aria-hidden="true"
+              className="animate-pulse rounded-2xl border border-border bg-card p-5"
+            >
               <div className="h-5 w-40 rounded bg-muted" />
               <div className="mt-3 h-4 w-2/3 rounded bg-muted" />
               <div className="mt-4 h-4 w-1/2 rounded bg-muted" />
             </div>
           ))}
         </div>
-      ) : rows.length === 0 ? (
+      ) : rows.length === 0 && error ? null : rows.length === 0 ? (
         <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
           No {kind} have been recorded yet.
         </p>
@@ -251,7 +266,9 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
                 >
                   <option value="">All statuses</option>
                   {current.statuses.map((status) => (
-                    <option key={status} value={status}>{status.replaceAll('_', ' ')}</option>
+                    <option key={status} value={status}>
+                      {status.replaceAll('_', ' ')}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -261,79 +278,86 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
             <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
               No records match these filters.
             </p>
-          ) : visibleRows.map((row) => (
-            <article
-              key={row.id}
-              className={`grid gap-4 rounded-2xl border bg-card p-5 md:grid-cols-[minmax(0,1fr)_220px] ${
-                row.status === 'DELIVERY_ISSUE' ? 'border-danger/40' : 'border-border'
-              }`}
-            >
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <h2 className="font-700 text-foreground">{row.title}</h2>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-600 ${
-                    row.status === 'DELIVERY_ISSUE'
-                      ? 'bg-danger-bg text-danger'
-                      : row.status === 'COMPLETED'
-                        ? 'bg-success-bg text-success'
-                        : 'bg-secondary text-muted-foreground'
-                  }`}>
-                    {row.status === 'DELIVERY_ISSUE'
-                      ? 'Customer reports not received'
-                      : row.status === 'COMPLETED' &&
-                          row.orderType === 'DELIVERY' &&
-                          row.customerConfirmedDelivery
-                        ? 'Customer confirmed delivery'
-                        : row.status.replaceAll('_', ' ')}
-                  </span>
+          ) : (
+            visibleRows.map((row) => (
+              <article
+                key={row.id}
+                className={`grid gap-4 rounded-2xl border bg-card p-5 md:grid-cols-[minmax(0,1fr)_220px] ${
+                  row.status === 'DELIVERY_ISSUE' ? 'border-danger/40' : 'border-border'
+                }`}
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <h2 className="font-700 text-foreground">{row.title}</h2>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-600 ${
+                        row.status === 'DELIVERY_ISSUE'
+                          ? 'bg-danger-bg text-danger'
+                          : row.status === 'COMPLETED'
+                            ? 'bg-success-bg text-success'
+                            : 'bg-secondary text-muted-foreground'
+                      }`}
+                    >
+                      {row.status === 'DELIVERY_ISSUE'
+                        ? 'Customer reports not received'
+                        : row.status === 'COMPLETED' &&
+                            row.orderType === 'DELIVERY' &&
+                            row.customerConfirmedDelivery
+                          ? 'Customer confirmed delivery'
+                          : row.status.replaceAll('_', ' ')}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">{row.subtitle}</p>
+                  <p className="mt-2 break-words text-sm text-foreground">{row.detail}</p>
+                  <time className="mt-2 block text-xs text-muted-foreground" dateTime={row.created}>
+                    {row.created ? new Date(row.created).toLocaleString('en-NP') : ''}
+                  </time>
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">{row.subtitle}</p>
-                <p className="mt-2 break-words text-sm text-foreground">{row.detail}</p>
-                <time className="mt-2 block text-xs text-muted-foreground" dateTime={row.created}>
-                  {row.created ? new Date(row.created).toLocaleString('en-NP') : ''}
-                </time>
-              </div>
-              <div className="flex flex-col gap-3">
-                <label
-                  htmlFor={`record-status-${row.id}`}
-                  className="mb-1.5 block text-xs font-600 text-muted-foreground"
-                >
-                  Update status
-                </label>
-                <select
-                  id={`record-status-${row.id}`}
-                  value={row.status}
-                  disabled={updatingId === row.id}
-                  onChange={(event) => void updateStatus(row, event.target.value)}
-                  className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground"
-                >
-                  {[...current.statuses.filter((status) =>
-                    row.orderType === 'DELIVERY'
-                      ? status !== 'COMPLETED'
-                      : status !== 'DELIVERY_ISSUE'
-                  ), ...(current.statuses.includes(row.status) ? [] : [row.status])].map((status) => (
-                    <option value={status} key={status}>
-                      {status === 'DELIVERY_ISSUE'
-                        ? 'Delivery issue — customer reports not received'
-                        : status === 'OUT_FOR_DELIVERY'
-                          ? 'Out for delivery'
-                          : status.replaceAll('_', ' ')}
-                    </option>
-                  ))}
-                </select>
-                {kind === 'contact' && (
-                  <button
-                    type="button"
-                    disabled={deletingId === row.id}
-                    onClick={() => void deleteContactMessage(row)}
-                    className="rounded-xl border border-danger/30 px-3 py-2 text-sm font-600 text-danger hover:bg-danger-bg disabled:opacity-60"
+                <div className="flex flex-col gap-3">
+                  <label
+                    htmlFor={`record-status-${row.id}`}
+                    className="mb-1.5 block text-xs font-600 text-muted-foreground"
                   >
-                    {deletingId === row.id ? 'Deleting…' : 'Delete message'}
-                  </button>
-                )}
-              </div>
-            </article>
-          ))}
+                    Update status
+                  </label>
+                  <select
+                    id={`record-status-${row.id}`}
+                    value={row.status}
+                    disabled={updatingId === row.id}
+                    onChange={(event) => void updateStatus(row, event.target.value)}
+                    className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground"
+                  >
+                    {[
+                      ...current.statuses.filter((status) =>
+                        row.orderType === 'DELIVERY'
+                          ? status !== 'COMPLETED'
+                          : status !== 'DELIVERY_ISSUE'
+                      ),
+                      ...(current.statuses.includes(row.status) ? [] : [row.status]),
+                    ].map((status) => (
+                      <option value={status} key={status}>
+                        {status === 'DELIVERY_ISSUE'
+                          ? 'Delivery issue — customer reports not received'
+                          : status === 'OUT_FOR_DELIVERY'
+                            ? 'Out for delivery'
+                            : status.replaceAll('_', ' ')}
+                      </option>
+                    ))}
+                  </select>
+                  {kind === 'contact' && (
+                    <button
+                      type="button"
+                      disabled={deletingId === row.id}
+                      onClick={() => void deleteContactMessage(row)}
+                      className="rounded-xl border border-danger/30 px-3 py-2 text-sm font-600 text-danger hover:bg-danger-bg disabled:opacity-60"
+                    >
+                      {deletingId === row.id ? 'Deleting…' : 'Delete message'}
+                    </button>
+                  )}
+                </div>
+              </article>
+            ))
+          )}
         </div>
       )}
     </div>

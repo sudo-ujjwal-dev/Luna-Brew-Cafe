@@ -25,7 +25,7 @@ export async function GET() {
           deliveryAddress: true,
           deliveryConfirmedAt: true,
           deliveryIssueReportedAt: true,
-          reviews: { select: { id: true, status: true } },
+          review: { select: { id: true, status: true } },
           items: {
             select: { itemName: true, quantity: true, unitPrice: true, lineTotal: true },
           },

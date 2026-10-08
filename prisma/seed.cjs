@@ -236,23 +236,6 @@ async function main() {
     });
   }
 
-  await prisma.galleryImage.upsert({
-    where: { id: 'demo-lakeside-cafe' },
-    update: {
-      title: 'Lakeside café atmosphere',
-      altText: 'Warm café interior with natural light',
-    },
-    create: {
-      id: 'demo-lakeside-cafe',
-      title: 'Lakeside café atmosphere',
-      imageUrl: 'https://images.unsplash.com/photo-1635076870262-9893a73ecb45',
-      altText: 'Warm café interior with natural light',
-      category: 'Interior',
-      visible: true,
-      sortOrder: 1,
-    },
-  });
-
   await prisma.businessSettings.upsert({
     where: { id: 'default' },
     update: {},

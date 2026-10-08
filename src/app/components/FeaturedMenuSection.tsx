@@ -56,9 +56,17 @@ export default function FeaturedMenuSection() {
       </div>
 
       {loading ? (
-        <div role="status" aria-label="Loading featured menu" className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          role="status"
+          aria-label="Loading featured menu"
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {[0, 1, 2].map((item) => (
-            <div key={item} aria-hidden="true" className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card">
+            <div
+              key={item}
+              aria-hidden="true"
+              className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card"
+            >
               <div className="h-48 bg-muted" />
               <div className="space-y-3 p-4">
                 <div className="h-4 w-20 rounded bg-muted" />

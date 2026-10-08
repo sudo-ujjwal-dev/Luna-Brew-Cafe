@@ -17,7 +17,6 @@ WHERE `id` = 'default'
   AND `locationLabel` = 'Lakeside, Pokhara, Nepal (demo area)';
 
 UPDATE `GalleryImage`
-SET `title` = 'Lakeside café atmosphere',
-    `altText` = 'Warm café interior with natural light'
+SET `visible` = false
 WHERE `id` = 'demo-lakeside-cafe'
   AND `title` = 'Lakeside café atmosphere concept';

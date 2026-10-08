@@ -214,9 +214,17 @@ export default function GalleryManager() {
       </form>
 
       {loading ? (
-        <div role="status" aria-label="Loading gallery" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div
+          role="status"
+          aria-label="Loading gallery"
+          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        >
           {[0, 1, 2].map((item) => (
-            <div key={item} aria-hidden="true" className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card">
+            <div
+              key={item}
+              aria-hidden="true"
+              className="animate-pulse overflow-hidden rounded-2xl border border-border bg-card"
+            >
               <div className="h-48 bg-muted" />
               <div className="space-y-3 p-4">
                 <div className="h-5 w-2/3 rounded bg-muted" />
@@ -261,11 +269,7 @@ export default function GalleryManager() {
                     onClick={() => void updateImage(image, { visible: !image.visible })}
                     className="font-600 text-primary hover:underline disabled:opacity-60"
                   >
-                    {updatingId === image.id
-                      ? 'Saving…'
-                      : image.visible
-                        ? 'Hide'
-                        : 'Publish'}
+                    {updatingId === image.id ? 'Saving…' : image.visible ? 'Hide' : 'Publish'}
                   </button>
                   <button
                     type="button"

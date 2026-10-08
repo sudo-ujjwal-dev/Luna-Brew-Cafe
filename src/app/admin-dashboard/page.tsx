@@ -59,7 +59,14 @@ export default async function AdminDashboardPage() {
       prisma.order.count({
         where: {
           status: {
-            in: ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERY_ISSUE'],
+            in: [
+              'PENDING',
+              'CONFIRMED',
+              'PREPARING',
+              'READY',
+              'OUT_FOR_DELIVERY',
+              'DELIVERY_ISSUE',
+            ],
           },
         },
       }),

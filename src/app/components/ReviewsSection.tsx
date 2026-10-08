@@ -97,9 +97,17 @@ export default function ReviewsSection() {
         </div>
 
         {loading ? (
-          <div role="status" aria-label="Loading reviews" className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <div
+            role="status"
+            aria-label="Loading reviews"
+            className="grid grid-cols-1 gap-5 md:grid-cols-3"
+          >
             {[0, 1, 2].map((item) => (
-              <div key={item} aria-hidden="true" className="animate-pulse rounded-2xl border border-border bg-card p-6">
+              <div
+                key={item}
+                aria-hidden="true"
+                className="animate-pulse rounded-2xl border border-border bg-card p-6"
+              >
                 <div className="h-4 w-24 rounded bg-muted" />
                 <div className="mt-5 h-4 w-full rounded bg-muted" />
                 <div className="mt-2 h-4 w-4/5 rounded bg-muted" />

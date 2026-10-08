@@ -31,7 +31,8 @@ export const metadata: Metadata = {
   keywords: ['cafe', 'coffee shop', 'restaurant', 'Luna Brew', 'Lakeside', 'Pokhara', 'Nepal'],
   openGraph: {
     title: 'Luna Brew Café',
-    description: 'Coffee, café favourites, and a relaxed place to pause in Lakeside, Pokhara, Nepal.',
+    description:
+      'Coffee, café favourites, and a relaxed place to pause in Lakeside, Pokhara, Nepal.',
     type: 'website',
     locale: 'en_NP',
   },

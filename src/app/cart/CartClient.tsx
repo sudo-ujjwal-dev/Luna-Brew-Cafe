@@ -13,11 +13,19 @@ export default function CartClient() {
 
   if (loading) {
     return (
-      <div role="status" aria-label="Loading cart" className="mt-8 grid gap-8 lg:grid-cols-[1fr_340px]">
+      <div
+        role="status"
+        aria-label="Loading cart"
+        className="mt-8 grid gap-8 lg:grid-cols-[1fr_340px]"
+      >
         <span className="sr-only">Loading cart items</span>
         <div className="space-y-4">
           {[0, 1].map((item) => (
-            <div key={item} aria-hidden="true" className="animate-pulse rounded-2xl border border-border bg-card p-4">
+            <div
+              key={item}
+              aria-hidden="true"
+              className="animate-pulse rounded-2xl border border-border bg-card p-4"
+            >
               <div className="flex gap-4">
                 <div className="h-24 w-24 rounded-xl bg-muted" />
                 <div className="flex-1">
@@ -29,7 +37,10 @@ export default function CartClient() {
             </div>
           ))}
         </div>
-        <div aria-hidden="true" className="h-48 animate-pulse rounded-2xl border border-border bg-card p-5">
+        <div
+          aria-hidden="true"
+          className="h-48 animate-pulse rounded-2xl border border-border bg-card p-5"
+        >
           <div className="h-5 w-32 rounded bg-muted" />
           <div className="mt-6 h-4 w-full rounded bg-muted" />
           <div className="mt-3 h-4 w-2/3 rounded bg-muted" />

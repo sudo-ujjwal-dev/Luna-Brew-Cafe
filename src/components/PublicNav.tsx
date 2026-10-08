@@ -209,6 +209,8 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
         {/* Mobile drawer */}
         <div
           id="public-mobile-navigation"
+          aria-hidden={!mobileOpen}
+          inert={!mobileOpen}
           className={`md:hidden transition-all duration-300 ${
             mobileOpen
               ? 'max-h-[75vh] overflow-y-auto opacity-100'
@@ -226,7 +228,7 @@ export default function PublicNav({ currentPath = '/' }: PublicNavProps) {
                 key={`mobile-nav-${link.href}`}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-500 transition-colors ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                   activePath === link.href
                     ? 'bg-secondary text-primary font-600'
                     : 'text-foreground hover:bg-secondary/60'

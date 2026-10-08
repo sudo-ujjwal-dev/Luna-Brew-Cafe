@@ -54,7 +54,7 @@ export default function GalleryPreview() {
           <p className="section-label mb-2">Gallery</p>
           <h2 className="text-display font-700 text-foreground">A Glimpse Inside</h2>
           <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-            From our cozy corners to the art of the pour — moments worth sharing.
+            Explore the atmosphere and café moments at Luna Brew.
           </p>
         </div>
 
@@ -68,36 +68,40 @@ export default function GalleryPreview() {
                 />
               ))
             : galleryImages.map((img, index) => (
-            <button
-              key={img.id}
-              onClick={() => openLightbox(index)}
-              className={`relative overflow-hidden rounded-2xl group cursor-pointer ${
-                index === 0 ? 'col-span-2 row-span-2' : ''
-              }`}
-              aria-label={`View gallery image: ${img.title}`}
-            >
-              <AppImage
-                src={img.src}
-                alt={img.alt}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                sizes="(max-width: 768px) 50vw, 33vw"
-              />
+                <button
+                  key={img.id}
+                  onClick={() => openLightbox(index)}
+                  className={`relative overflow-hidden rounded-2xl group cursor-pointer ${
+                    index === 0 ? 'col-span-2 row-span-2' : ''
+                  }`}
+                  aria-label={`View gallery image: ${img.title}`}
+                >
+                  <AppImage
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 50vw, 33vw"
+                  />
 
-              <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-all duration-300 flex items-center justify-center">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/20 backdrop-blur-sm rounded-xl p-2">
-                  <ZoomIn size={20} className="text-white" />
-                </div>
-              </div>
-              <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="bg-black/50 backdrop-blur-sm text-white text-xs font-600 px-2.5 py-1 rounded-lg">
-                  {img.category}
-                </span>
-              </div>
-            </button>
+                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-all duration-300 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/20 backdrop-blur-sm rounded-xl p-2">
+                      <ZoomIn size={20} className="text-white" />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="bg-black/50 backdrop-blur-sm text-white text-xs font-600 px-2.5 py-1 rounded-lg">
+                      {img.category}
+                    </span>
+                  </div>
+                </button>
               ))}
         </div>
-        {loading && <span role="status" className="sr-only">Loading gallery images</span>}
+        {loading && (
+          <span role="status" className="sr-only">
+            Loading gallery images
+          </span>
+        )}
         {error && (
           <p role="alert" className="py-8 text-center text-sm text-danger">
             {error}
