@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { reviewSchema } from '@/lib/validation';
 import { getCustomerSession } from '@/lib/customer-auth';
 import { prisma } from '@/lib/prisma';
+import { createAdminNotification } from '@/lib/admin-notifications';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -48,16 +49,26 @@ export async function POST(request: Request, context: RouteContext) {
         { status: 409 }
       );
     }
-    const review = await prisma.review.create({
-      data: {
-        ...parsed.data,
-        customerName: customer.name,
-        orderId: order.id,
-        status: 'PENDING',
-      },
-      select: { id: true, status: true },
+    const review = await prisma.$transaction(async (transaction) => {
+      const createdReview = await transaction.review.create({
+        data: {
+          ...parsed.data,
+          customerName: customer.name,
+          orderId: order.id,
+          status: 'PENDING',
+        },
+        select: { id: true, customerName: true, rating: true, comment: true, status: true },
+      });
+      await createAdminNotification(transaction, {
+        eventKey: `review:${createdReview.id}`,
+        type: 'NEW_REVIEW',
+        title: 'New review awaiting moderation',
+        message: `${createdReview.customerName} · ${createdReview.rating}/5 · ${createdReview.comment.slice(0, 160)}`,
+        link: `/admin-dashboard/reviews#record-${createdReview.id}`,
+      });
+      return createdReview;
     });
-    return NextResponse.json({ review }, { status: 201 });
+    return NextResponse.json({ review: { id: review.id, status: review.status } }, { status: 201 });
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'P2002') {
       return NextResponse.json(

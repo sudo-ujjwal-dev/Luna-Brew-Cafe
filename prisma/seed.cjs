@@ -183,6 +183,82 @@ const items = [
   ],
 ];
 
+const galleryImages = [
+  {
+    id: 'demo-lakeside-cafe',
+    title: 'Lakeside café coffee concept',
+    imageUrl: '/images/menu/flat-white.jpg',
+    altText: 'A flat white served alongside a small café treat',
+    category: 'Drinks',
+    visible: false,
+    sortOrder: 0,
+  },
+  {
+    id: 'gallery-espresso',
+    title: 'Coffee, freshly prepared',
+    imageUrl: '/images/menu/luna-signature-espresso.jpg',
+    altText: 'Freshly prepared espresso in a small cup',
+    category: 'Drinks',
+    sortOrder: 1,
+  },
+  {
+    id: 'gallery-flat-white',
+    title: 'A quiet coffee break',
+    imageUrl: '/images/menu/flat-white.jpg',
+    altText: 'A flat white served alongside a small café treat',
+    category: 'Drinks',
+    sortOrder: 2,
+  },
+  {
+    id: 'gallery-breakfast',
+    title: 'Breakfast at the café',
+    imageUrl: '/images/menu/luna-breakfast.jpg',
+    altText: 'A breakfast plate with egg and fresh accompaniments',
+    category: 'Food',
+    sortOrder: 3,
+  },
+  {
+    id: 'gallery-avocado-toast',
+    title: 'Avocado toast',
+    imageUrl: '/images/menu/avocado-toast.jpg',
+    altText: 'Avocado toast with lemon and herbs',
+    category: 'Food',
+    sortOrder: 4,
+  },
+  {
+    id: 'gallery-momo',
+    title: 'Steamed vegetable momo',
+    imageUrl: '/images/menu/vegetable-momo.jpg',
+    altText: 'Steamed vegetable momo served with tomato achar',
+    category: 'Food',
+    sortOrder: 5,
+  },
+  {
+    id: 'gallery-sel-roti',
+    title: 'A taste of Nepal',
+    imageUrl: '/images/menu/sel-roti.jpg',
+    altText: 'Traditional Nepali sel roti',
+    category: 'Food',
+    sortOrder: 6,
+  },
+  {
+    id: 'gallery-lemon-tart',
+    title: 'Lemon tart',
+    imageUrl: '/images/menu/lemon-tart.jpg',
+    altText: 'Lemon tart with a golden pastry crust',
+    category: 'Desserts',
+    sortOrder: 7,
+  },
+  {
+    id: 'gallery-cold-brew',
+    title: 'Cold brew over ice',
+    imageUrl: '/images/menu/cold-brew.jpg',
+    altText: 'Cold brew coffee served over ice',
+    category: 'Drinks',
+    sortOrder: 8,
+  },
+];
+
 async function main() {
   const categoryIds = new Map();
   for (const category of categories) {
@@ -236,6 +312,14 @@ async function main() {
     });
   }
 
+  for (const image of galleryImages) {
+    await prisma.galleryImage.upsert({
+      where: { id: image.id },
+      update: image,
+      create: image,
+    });
+  }
+
   await prisma.businessSettings.upsert({
     where: { id: 'default' },
     update: {},
@@ -251,7 +335,7 @@ async function main() {
     },
   });
 
-  console.log('Luna Brew Café menu, gallery, and settings are ready.');
+  console.log('Luna Brew Café menu, gallery seed records, and settings are ready.');
 }
 
 main()

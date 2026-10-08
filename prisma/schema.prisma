@@ -49,6 +49,14 @@ enum ContactStatus {
   RESOLVED
 }
 
+enum NotificationType {
+  NEW_ORDER
+  NEW_RESERVATION
+  NEW_REVIEW
+  NEW_CONTACT_MESSAGE
+  DELIVERY_ISSUE
+}
+
 model User {
   id           String           @id @default(cuid()) @db.VarChar(30)
   email        String           @unique @db.VarChar(254)
@@ -142,6 +150,7 @@ model Order {
   deliveryConfirmedAt     DateTime?
   deliveryIssueReportedAt DateTime?
   deliveryIssueResolvedAt DateTime?
+  completedAt             DateTime?
   userId                  String?     @db.VarChar(30)
   user                    User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   items                   OrderItem[]
@@ -153,6 +162,7 @@ model Order {
   @@index([type, createdAt])
   @@index([phone, createdAt])
   @@index([userId, createdAt])
+  @@index([status, completedAt])
 }
 
 model OrderItem {
@@ -214,6 +224,19 @@ model GalleryImage {
   updatedAt DateTime @updatedAt
 
   @@index([visible, sortOrder])
+}
+
+model Notification {
+  id        String           @id @default(cuid()) @db.VarChar(30)
+  eventKey  String           @unique @db.VarChar(100)
+  type      NotificationType
+  title     String           @db.VarChar(120)
+  message   String           @db.Text
+  link      String           @db.VarChar(512)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([readAt, createdAt])
 }
 
 model BusinessSettings {

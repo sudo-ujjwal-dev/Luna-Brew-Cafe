@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { formatValidationError, reservationSchema } from '@/lib/validation';
 import { getCustomerSession } from '@/lib/customer-auth';
+import { createAdminNotification } from '@/lib/admin-notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,18 +54,35 @@ export async function POST(request: Request) {
 
   try {
     const customer = await getCustomerSession();
-    const reservation = await prisma.reservation.create({
-      data: {
-        customerName: customer?.name ?? name,
-        phone,
-        email: customer?.email ?? email.toLowerCase(),
-        date: dateValue,
-        time,
-        guestCount: guests,
-        specialRequest: message || null,
-        userId: customer?.id,
-      },
-      select: { id: true, status: true, date: true, time: true, guestCount: true },
+    const reservation = await prisma.$transaction(async (transaction) => {
+      const createdReservation = await transaction.reservation.create({
+        data: {
+          customerName: customer?.name ?? name,
+          phone,
+          email: customer?.email ?? email.toLowerCase(),
+          date: dateValue,
+          time,
+          guestCount: guests,
+          specialRequest: message || null,
+          userId: customer?.id,
+        },
+        select: {
+          id: true,
+          customerName: true,
+          status: true,
+          date: true,
+          time: true,
+          guestCount: true,
+        },
+      });
+      await createAdminNotification(transaction, {
+        eventKey: `reservation:${createdReservation.id}`,
+        type: 'NEW_RESERVATION',
+        title: 'New reservation',
+        message: `${createdReservation.customerName} · ${createdReservation.date.toISOString().slice(0, 10)} at ${createdReservation.time} · ${createdReservation.guestCount} guests`,
+        link: `/admin-dashboard/reservations#record-${createdReservation.id}`,
+      });
+      return createdReservation;
     });
 
     return NextResponse.json(

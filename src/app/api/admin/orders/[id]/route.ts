@@ -59,6 +59,14 @@ export async function PATCH(request: Request, context: RouteContext) {
       where: { id },
       data: {
         status: parsed.data.status,
+        completedAt:
+          parsed.data.status === 'COMPLETED'
+            ? existing.status === 'COMPLETED'
+              ? undefined
+              : new Date()
+            : existing.status === 'COMPLETED'
+              ? null
+              : undefined,
         ...(existing.status === 'DELIVERY_ISSUE' && parsed.data.status !== 'DELIVERY_ISSUE'
           ? { deliveryIssueResolvedAt: new Date() }
           : {}),

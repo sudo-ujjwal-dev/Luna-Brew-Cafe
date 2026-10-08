@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { contactMessageSchema, formatValidationError } from '@/lib/validation';
 import { getCustomerSession } from '@/lib/customer-auth';
 import { sendContactNotification } from '@/lib/contact-email';
+import { createAdminNotification } from '@/lib/admin-notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,14 +28,24 @@ export async function POST(request: Request) {
 
   try {
     const customer = await getCustomerSession();
-    const message = await prisma.contactMessage.create({
-      data: {
-        ...parsed.data,
-        email: parsed.data.email.toLowerCase(),
-        phone: parsed.data.phone || null,
-        userId: customer?.id,
-      },
-      select: { id: true, createdAt: true },
+    const message = await prisma.$transaction(async (transaction) => {
+      const createdMessage = await transaction.contactMessage.create({
+        data: {
+          ...parsed.data,
+          email: parsed.data.email.toLowerCase(),
+          phone: parsed.data.phone || null,
+          userId: customer?.id,
+        },
+        select: { id: true, name: true, subject: true, createdAt: true },
+      });
+      await createAdminNotification(transaction, {
+        eventKey: `contact:${createdMessage.id}`,
+        type: 'NEW_CONTACT_MESSAGE',
+        title: 'New contact message',
+        message: `${createdMessage.name} · ${createdMessage.subject}`,
+        link: `/admin-dashboard/messages#record-${createdMessage.id}`,
+      });
+      return createdMessage;
     });
     const delivery = await sendContactNotification(parsed.data);
     return NextResponse.json(

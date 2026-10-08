@@ -111,6 +111,23 @@ function normalizeRow(kind: RecordKind, row: Record<string, unknown>): RecordRow
   };
 }
 
+function emptyMessage(kind: RecordKind, statusFilter: string) {
+  if (kind === 'orders') {
+    if (statusFilter === 'DELIVERY_ISSUE') return 'No delivery issues.';
+    return 'No recent orders.';
+  }
+  if (kind === 'reservations') {
+    return statusFilter === 'PENDING' ? 'No pending reservations.' : 'No reservations to show.';
+  }
+  if (kind === 'reviews') {
+    return statusFilter === 'PENDING' || !statusFilter
+      ? 'No reviews waiting for moderation.'
+      : 'No reviews in this status.';
+  }
+  if (statusFilter === 'UNREAD' || !statusFilter) return 'No new messages.';
+  return 'No messages in this status.';
+}
+
 export default function RecordManager({ kind }: { kind: RecordKind }) {
   const [rows, setRows] = useState<RecordRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -241,7 +258,7 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
         </div>
       ) : rows.length === 0 && error ? null : rows.length === 0 ? (
         <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          No {kind} have been recorded yet.
+          {emptyMessage(kind, statusFilter)}
         </p>
       ) : (
         <div className="space-y-4">
@@ -276,13 +293,14 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
           )}
           {visibleRows.length === 0 ? (
             <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-              No records match these filters.
+              {emptyMessage(kind, statusFilter)}
             </p>
           ) : (
             visibleRows.map((row) => (
               <article
                 key={row.id}
-                className={`grid gap-4 rounded-2xl border bg-card p-5 md:grid-cols-[minmax(0,1fr)_220px] ${
+                id={`record-${row.id}`}
+                className={`scroll-mt-20 grid gap-4 rounded-2xl border bg-card p-5 md:grid-cols-[minmax(0,1fr)_220px] ${
                   row.status === 'DELIVERY_ISSUE' ? 'border-danger/40' : 'border-border'
                 }`}
               >
@@ -304,13 +322,19 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
                             row.orderType === 'DELIVERY' &&
                             row.customerConfirmedDelivery
                           ? 'Customer confirmed delivery'
-                          : row.status.replaceAll('_', ' ')}
+                          : row.status === 'OUT_FOR_DELIVERY' && row.orderType === 'DELIVERY'
+                            ? 'Out for delivery · awaiting customer confirmation'
+                            : row.status.replaceAll('_', ' ')}
                     </span>
                   </div>
                   <p className="mt-1 text-sm text-muted-foreground">{row.subtitle}</p>
                   <p className="mt-2 break-words text-sm text-foreground">{row.detail}</p>
                   <time className="mt-2 block text-xs text-muted-foreground" dateTime={row.created}>
-                    {row.created ? new Date(row.created).toLocaleString('en-NP') : ''}
+                    {row.created
+                      ? new Date(row.created).toLocaleString('en-NP', {
+                          timeZone: 'Asia/Kathmandu',
+                        })
+                      : ''}
                   </time>
                 </div>
                 <div className="flex flex-col gap-3">
@@ -339,7 +363,7 @@ export default function RecordManager({ kind }: { kind: RecordKind }) {
                         {status === 'DELIVERY_ISSUE'
                           ? 'Delivery issue — customer reports not received'
                           : status === 'OUT_FOR_DELIVERY'
-                            ? 'Out for delivery'
+                            ? 'Out for delivery — awaiting customer confirmation'
                             : status.replaceAll('_', ' ')}
                       </option>
                     ))}

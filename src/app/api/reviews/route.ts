@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { formatValidationError, reviewSchema } from '@/lib/validation';
+import { createAdminNotification } from '@/lib/admin-notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,11 +47,21 @@ export async function POST(request: Request) {
   }
 
   try {
-    const review = await prisma.review.create({
-      data: { ...parsed.data, status: 'PENDING' },
-      select: { id: true, status: true },
+    const review = await prisma.$transaction(async (transaction) => {
+      const createdReview = await transaction.review.create({
+        data: { ...parsed.data, status: 'PENDING' },
+        select: { id: true, customerName: true, rating: true, comment: true, status: true },
+      });
+      await createAdminNotification(transaction, {
+        eventKey: `review:${createdReview.id}`,
+        type: 'NEW_REVIEW',
+        title: 'New review awaiting moderation',
+        message: `${createdReview.customerName} · ${createdReview.rating}/5 · ${createdReview.comment.slice(0, 160)}`,
+        link: `/admin-dashboard/reviews#record-${createdReview.id}`,
+      });
+      return createdReview;
     });
-    return NextResponse.json({ review }, { status: 201 });
+    return NextResponse.json({ review: { id: review.id, status: review.status } }, { status: 201 });
   } catch (error) {
     console.error('Review persistence failed:', error);
     return NextResponse.json({ error: 'Unable to save your review right now.' }, { status: 503 });

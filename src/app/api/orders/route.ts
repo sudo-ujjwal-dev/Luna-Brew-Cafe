@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { formatValidationError, orderSchema } from '@/lib/validation';
 import { getCustomerSession } from '@/lib/customer-auth';
+import { createAdminNotification } from '@/lib/admin-notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,40 +76,51 @@ export async function POST(request: Request) {
     const dateCode = new Date().toISOString().slice(0, 10).replaceAll('-', '');
     const orderNumber = `LB-${dateCode}-${randomBytes(8).toString('hex').toUpperCase()}`;
 
-    const order = await prisma.order.create({
-      data: {
-        orderNumber,
-        customerName: submitted.customerName,
-        phone: submitted.phone,
-        email: submitted.email ? submitted.email.toLowerCase() : null,
-        ...(customer
-          ? {
-              userId: customer.id,
-              customerName: customer.name,
-              email: customer.email,
-            }
-          : {}),
-        type: submitted.type,
-        paymentMethod: submitted.paymentMethod,
-        deliveryAddress: submitted.type === 'DELIVERY' ? submitted.deliveryAddress : null,
-        notes: submitted.notes || null,
-        subtotal,
-        deliveryFee,
-        total,
-        items: {
-          create: orderLines.map(({ selected, menuItem }) => {
-            const lineTotal = menuItem.price.mul(selected.quantity);
-            return {
-              menuItemId: menuItem.id,
-              itemName: menuItem.name,
-              unitPrice: menuItem.price,
-              quantity: selected.quantity,
-              lineTotal,
-            };
-          }),
+    const order = await prisma.$transaction(async (transaction) => {
+      const createdOrder = await transaction.order.create({
+        data: {
+          orderNumber,
+          customerName: submitted.customerName,
+          phone: submitted.phone,
+          email: submitted.email ? submitted.email.toLowerCase() : null,
+          ...(customer
+            ? {
+                userId: customer.id,
+                customerName: customer.name,
+                email: customer.email,
+              }
+            : {}),
+          type: submitted.type,
+          paymentMethod: submitted.paymentMethod,
+          deliveryAddress: submitted.type === 'DELIVERY' ? submitted.deliveryAddress : null,
+          notes: submitted.notes || null,
+          subtotal,
+          deliveryFee,
+          total,
+          items: {
+            create: orderLines.map(({ selected, menuItem }) => {
+              const lineTotal = menuItem.price.mul(selected.quantity);
+              return {
+                menuItemId: menuItem.id,
+                itemName: menuItem.name,
+                unitPrice: menuItem.price,
+                quantity: selected.quantity,
+                lineTotal,
+              };
+            }),
+          },
         },
-      },
-      select: { id: true, orderNumber: true, status: true, total: true, createdAt: true },
+        select: { id: true, orderNumber: true, status: true, total: true, createdAt: true },
+      });
+      const displayTotal = `Rs. ${createdOrder.total.toNumber().toLocaleString('en-NP')}`;
+      await createAdminNotification(transaction, {
+        eventKey: `order:${createdOrder.id}`,
+        type: 'NEW_ORDER',
+        title: 'New order received',
+        message: `Order #${createdOrder.orderNumber} · ${submitted.type.replaceAll('_', ' ')} · ${displayTotal} · ${customer?.name ?? submitted.customerName}`,
+        link: `/admin-dashboard/orders#record-${createdOrder.id}`,
+      });
+      return createdOrder;
     });
 
     return NextResponse.json(

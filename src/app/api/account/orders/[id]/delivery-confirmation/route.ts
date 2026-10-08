@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getCustomerSession } from '@/lib/customer-auth';
 import { prisma } from '@/lib/prisma';
+import { createAdminNotification } from '@/lib/admin-notifications';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -28,17 +29,35 @@ export async function POST(request: Request, context: RouteContext) {
   const { id } = await context.params;
   const confirmedAt = new Date();
   try {
-    const result = await prisma.order.updateMany({
-      where: {
-        id,
-        userId: customer.id,
-        type: 'DELIVERY',
-        status: 'OUT_FOR_DELIVERY',
-        deliveryConfirmedAt: null,
-      },
-      data: parsed.data.received
-        ? { status: 'COMPLETED', deliveryConfirmedAt: confirmedAt }
-        : { status: 'DELIVERY_ISSUE', deliveryIssueReportedAt: confirmedAt },
+    const result = await prisma.$transaction(async (transaction) => {
+      const update = await transaction.order.updateMany({
+        where: {
+          id,
+          userId: customer.id,
+          type: 'DELIVERY',
+          status: 'OUT_FOR_DELIVERY',
+          deliveryConfirmedAt: null,
+        },
+        data: parsed.data.received
+          ? { status: 'COMPLETED', deliveryConfirmedAt: confirmedAt, completedAt: confirmedAt }
+          : { status: 'DELIVERY_ISSUE', deliveryIssueReportedAt: confirmedAt },
+      });
+      if (update.count === 1 && !parsed.data.received) {
+        const order = await transaction.order.findUnique({
+          where: { id },
+          select: { orderNumber: true, customerName: true },
+        });
+        if (order) {
+          await createAdminNotification(transaction, {
+            eventKey: `delivery-issue:${id}:${confirmedAt.getTime()}`,
+            type: 'DELIVERY_ISSUE',
+            title: 'Delivery issue reported',
+            message: `Order #${order.orderNumber} · ${order.customerName} reports it was not received.`,
+            link: `/admin-dashboard/orders#record-${id}`,
+          });
+        }
+      }
+      return update;
     });
     if (result.count !== 1) {
       const order = await prisma.order.findFirst({
